@@ -1,37 +1,47 @@
 const db = require('../db/mariadb');
-const http = require('http');
+const cateQuery = require('../db/query/cate.js');
 const express = require('express');
+const logger = require('../winston')
 const router = express.Router();
 
 /* GET items listing. */
 router.get('/', function(req, res, next) {
-  db.query(`select * from cate`, function(error, result){
-    console.log(result);
+  //logger.info(req);
+  db.query(cateQuery.select, function(err, result){
+    if(err){
+      logger.error(err);
+    }
     res.json(result);
   });
 });
 
+/* PUT ITEM */
 router.put('/', function(req, res, next) {
 
-  console.log(req.body);
+  let data = req.body;
+  let sql = '', params = [];
 
-  var data = req.body;
-
-  if(!data)
+  if(!data || data.id == undefined){
+    logger.error('undefined : id');
     res.send(0);
-
-  var sql = 'INSERT INTO cate(id, gubun, name, remark)VALUES((select ifnull(max(id), 0) + 1 from cate ALIAS_FOR_SUBQUERY),?,?, ?)';
-
-  var params = [parseInt(data.gubun), data.name, data.remark];
+  }
+  
+  if(data.id == '0'){
+    sql = cateQuery.insert;
+    params = [parseInt(data.gubun), data.name, data.remark];
+  }
+  else{
+    sql = cateQuery.update;
+    params = [parseInt(data.gubun), data.name, data.remark, parseInt(data.id)];
+  }
 
   db.query(sql, params,function(err,rows,fields) {
     if(err){
-      console.log(err);
+      logger.error(err);
+      res.send(0);
     }else{
-      console.log(rows.insertId);
+      res.send(fields);
     }
-
-    res.send(fields);
   });
 });
 
