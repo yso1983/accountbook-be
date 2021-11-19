@@ -111,35 +111,35 @@ const getRandom = (idx) =>
   return printVal;
 }
 
-const returnRandomData = (res, httpMethod) =>{
+function sleep(f, delay){
+  return new Promise((res, rej) => {
+     setTimeout(() => res(f), delay)
+  });
+}
+
+async function execute(result){
+
+    await sleep(getRandom(1), 100).then(r => result.push(r));
+    await sleep(getRandom(1), 100).then(r => result.push(r));
+    await sleep(getRandom(1), 100).then(r => result.push(r));
+    await sleep(getRandom(1), 100).then(r => result.push(r));
+    await sleep(getRandom(1), 100).then(r => result.push(r));
+    
+    return result;
+}
+
+const returnRandomData = (res, httpMethod) => {
   let result = [];
   
-  //promise아닌 더 좋은 방법이 없을까...
-  new Promise((resolve, reject) => {
-    resolve(getRandom(1));
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
+  execute(result)
+  .then(r => {
     if(httpMethod === 'get'){
       res.render('lotto/random', { code: 1, result: result });
     }
     else{
       res.json(result);
     }
-  }).catch(err => {
-    logger.error(err);
-    
+  }).catch(r => {
     if(httpMethod === 'get'){
       res.render('lotto/random', { code: 0, result: result });
     }
@@ -147,6 +147,40 @@ const returnRandomData = (res, httpMethod) =>{
       res.json(0);
     }
   });
+
+  // //promise아닌 더 좋은 방법이 없을까...
+  // new Promise((resolve, reject) => {
+  //   resolve(getRandom(1));
+  // }).then(r => {
+  //   result.push(r);
+  //   return getRandom(1);
+  // }).then(r => {
+  //   result.push(r);
+  //   return getRandom(1);
+  // }).then(r => {
+  //   result.push(r);
+  //   return getRandom(1);
+  // }).then(r => {
+  //   result.push(r);
+  //   return getRandom(1);
+  // }).then(r => {
+  //   result.push(r);
+  //   if(httpMethod === 'get'){
+  //     res.render('lotto/random', { code: 1, result: result });
+  //   }
+  //   else{
+  //     res.json(result);
+  //   }
+  // }).catch(err => {
+  //   logger.error(err);
+    
+  //   if(httpMethod === 'get'){
+  //     res.render('lotto/random', { code: 0, result: result });
+  //   }
+  //   else{
+  //     res.json(0);
+  //   }
+  // });
 }
 
 /******************************** Router *******************************************/
