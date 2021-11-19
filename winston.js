@@ -30,14 +30,14 @@ const logger = winston.createLogger({
             zippedArchive: true, 
         }),
       	// warn 레벨 로그를 저장할 파일 설정
-        new winstonDaily({
-            level: 'warn',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir+ '/warn',
-            filename: `%DATE%.warn.log`, // file 이름 날짜로 저장
-            maxFiles: 7,  // 30일치 로그 파일 저장
-            zippedArchive: true, 
-        }),
+        // new winstonDaily({
+        //     level: 'warn',
+        //     datePattern: 'YYYY-MM-DD',
+        //     dirname: logDir+ '/warn',
+        //     filename: `%DATE%.warn.log`, // file 이름 날짜로 저장
+        //     maxFiles: 7,  // 30일치 로그 파일 저장
+        //     zippedArchive: true, 
+        // }),
         // error 레벨 로그를 저장할 파일 설정
         new winstonDaily({
             level: 'error',
