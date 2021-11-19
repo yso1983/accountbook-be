@@ -76,17 +76,13 @@ const getRandom = (idx) =>
 
   let printVal = [];
   let sNum = 0;
-  let loopCnt = 6;
-  for (i = 0; i < loopCnt; i++) {
-      sNum = Math.ceil(45 * Math.random());
-      if(printVal.indexOf(sNum) > -1){
-          loopCnt++;
-      }
-      else
-      {
-          printVal.push(sNum);
-      }
-  }
+
+  do {
+
+     sNum = Math.ceil(45 * Math.random());
+     if(printVal.indexOf(sNum) == -1) printVal.push(sNum);
+
+  } while (printVal.length < 6);
 
   printVal = printVal.sort((a, b) => a - b);
 
