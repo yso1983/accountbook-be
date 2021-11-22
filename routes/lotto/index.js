@@ -68,8 +68,7 @@ const callLottoApi = (drwNo, response) => {
   })
 }
 
-const getRandom = (idx) =>
-{   
+const getRandom = (idx) => {   
   //무한루프 방지용
   if(idx > 3)
     return [];
@@ -115,13 +114,10 @@ function sleep(f, delay){
 
 async function execute(result){
 
+  for (let index = 0; index < 5; index++) {
     await sleep(getRandom(1), 100).then(r => result.push(r));
-    await sleep(getRandom(1), 100).then(r => result.push(r));
-    await sleep(getRandom(1), 100).then(r => result.push(r));
-    await sleep(getRandom(1), 100).then(r => result.push(r));
-    await sleep(getRandom(1), 100).then(r => result.push(r));
-    
-    return result;
+  }
+  return result;
 }
 
 const returnRandomData = (res, httpMethod) => {
@@ -130,12 +126,47 @@ const returnRandomData = (res, httpMethod) => {
   execute(result)
   .then(r => {
     if(httpMethod === 'get'){
+      res.render('lotto/random', { code: 1, result: r });
+    }
+    else{
+      res.json(r);
+    }
+  }).catch(r => {
+    if(httpMethod === 'get'){
+      res.render('lotto/random', { code: 0, result: '' });
+    }
+    else{
+      res.json(0);
+    }
+  });
+
+  /* 
+  //promise아닌 더 좋은 방법이 없을까...
+  new Promise((resolve, reject) => {
+    resolve(getRandom(1));
+  }).then(r => {
+    result.push(r);
+    return getRandom(1);
+  }).then(r => {
+    result.push(r);
+    return getRandom(1);
+  }).then(r => {
+    result.push(r);
+    return getRandom(1);
+  }).then(r => {
+    result.push(r);
+    return getRandom(1);
+  }).then(r => {
+    result.push(r);
+    if(httpMethod === 'get'){
       res.render('lotto/random', { code: 1, result: result });
     }
     else{
       res.json(result);
     }
-  }).catch(r => {
+  }).catch(err => {
+    logger.error(err);
+    
     if(httpMethod === 'get'){
       res.render('lotto/random', { code: 0, result: result });
     }
@@ -143,40 +174,7 @@ const returnRandomData = (res, httpMethod) => {
       res.json(0);
     }
   });
-
-  // //promise아닌 더 좋은 방법이 없을까...
-  // new Promise((resolve, reject) => {
-  //   resolve(getRandom(1));
-  // }).then(r => {
-  //   result.push(r);
-  //   return getRandom(1);
-  // }).then(r => {
-  //   result.push(r);
-  //   return getRandom(1);
-  // }).then(r => {
-  //   result.push(r);
-  //   return getRandom(1);
-  // }).then(r => {
-  //   result.push(r);
-  //   return getRandom(1);
-  // }).then(r => {
-  //   result.push(r);
-  //   if(httpMethod === 'get'){
-  //     res.render('lotto/random', { code: 1, result: result });
-  //   }
-  //   else{
-  //     res.json(result);
-  //   }
-  // }).catch(err => {
-  //   logger.error(err);
-    
-  //   if(httpMethod === 'get'){
-  //     res.render('lotto/random', { code: 0, result: result });
-  //   }
-  //   else{
-  //     res.json(0);
-  //   }
-  // });
+   */
 }
 
 /******************************** Router *******************************************/
@@ -184,9 +182,39 @@ const returnRandomData = (res, httpMethod) => {
 //API로 동기화 처리
 router.get('/sync/:id', function(req, res, next) {
 
-  let id = req.params.id;
+  var id = req.params.id;
+  (async () => {
+    let r = null;
+    await (() => new Promise((resolve, reject) => {
+        
+      if(id == undefined || id == '' || id == "0") {
 
-  getByData(parseInt(id), res);
+        db.query(query.selectLastDrwNo, (err, rows, fields) => {
+          
+          if(err){
+            reject(err);
+          }
+
+          if(rows && rows.length > 0){
+            resolve(JSON.parse(JSON.stringify(rows))[0].drwNo);
+          }else{
+            resolve(1);
+          }
+        });
+      }
+      else{
+        resolve(id);
+      }
+
+    }))()
+    .then(result => r = result)
+    .catch((err) => {logger.error(err); r = 990;})
+    logger.info("async : " + r);
+    return r;
+  })()
+  .then(r => {
+    getByData(parseInt(r), res);
+  });
 });
 
 //당첨 내역 리스트

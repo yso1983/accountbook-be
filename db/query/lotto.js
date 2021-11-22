@@ -3,6 +3,7 @@ const selectById = `select * from lotto_info WHERE drwNo = ? `;
 const insert = `insert into lotto_info(drwNo , drwtNo1 , drwtNo2 , drwtNo3 , drwtNo4 
      , drwtNo5, drwtNo6 , bnusNo , totSellamnt , firstAccumamnt , firstPrzwnerCo , firstWinamnt, drwNoDate ) 
      values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) `;
+const selectLastDrwNo = `select max(drwNo) as 'drwNo' from lotto_info `;
 
 const insertSort = `insert into lotto_info_sort(drwNo , drwtNo1 , drwtNo2 , drwtNo3 , drwtNo4, drwtNo5, drwtNo6 ) 
      values(?, ?, ?, ?, ?, ?, ? ) `;
@@ -15,4 +16,5 @@ module.exports = {
   insert: insert,
   insertSort: insertSort,
   selectSort: selectSort,
+  selectLastDrwNo: selectLastDrwNo,
 };
