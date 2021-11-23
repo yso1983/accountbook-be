@@ -1,7 +1,7 @@
-const db = require('../../db/mariadb');
-const query = require('../../db/query/lotto.js');
+const db = require('@mariadb');
+const query = require('@query/lotto.js');
 const express = require('express');
-const logger = require('../../winston')
+const logger = require('@root/winston')
 const router = express.Router();
 const axios = require('axios');
 

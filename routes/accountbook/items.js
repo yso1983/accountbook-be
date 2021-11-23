@@ -1,7 +1,7 @@
-const db = require('../db/mariadb');
-const cateQuery = require('../db/query/cate.js');
+const db = require('@mariadb');
+const cateQuery = require('@query/cate.js');
 const express = require('express');
-const logger = require('../winston')
+const logger = require('@root/winston')
 const router = express.Router();
 
 /* GET items listing. */

@@ -4,7 +4,14 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "nodemon ./bin/www"
+    "test": "nodemon ./bin/www",
+    "lint": "eslint routes/*.js"
+  },
+  "_moduleAliases": {
+    "@root"	 : ".", 
+    "@mariadb" : "./db/mariadb.js",
+    "@query" : "./db/query",
+    "@routes" : "./routes"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -13,10 +20,14 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "module-alias": "^2.2.2",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0"
   }
 }
