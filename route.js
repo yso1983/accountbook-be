@@ -4,7 +4,8 @@ router.use('/', require('@routes/index'));
 //router.use('/users', require('@routes/accountbook/users'));
 
 /* 가계부 */
-router.use('/cate', require('@routes/accountbook/items'));
+router.use('/account', require('@routes/accountbook/account'));
+router.use('/cate', require('@routes/accountbook/cate'));
 router.use('/departure', require('@routes/accountbook/departure'));
 router.use('/user', require('@routes/accountbook/user'));
 
