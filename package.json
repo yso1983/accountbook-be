@@ -8,10 +8,10 @@
     "lint": "eslint routes/*.js"
   },
   "_moduleAliases": {
-    "@root"	 : ".", 
-    "@mariadb" : "./db/mariadb.js",
-    "@query" : "./db/query",
-    "@routes" : "./routes"
+    "@root": ".",
+    "@mariadb": "./db/mariadb.js",
+    "@query": "./db/query",
+    "@routes": "./routes"
   },
   "dependencies": {
     "axios": "^0.24.0",

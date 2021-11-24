@@ -13,7 +13,13 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(express.json());
+
 app.use('/', require('./route'));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // morgan 로그 설정 
 const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 
@@ -22,10 +28,6 @@ const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" 
 app.use(morgan('dev', {stream : logger.stream}));
 //app.use(morgan(morganFormat, {stream : logger.stream})); 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
