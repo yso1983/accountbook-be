@@ -2,6 +2,7 @@ const db = require('@mariadb');
 const query = require('@query/account.js');
 const express = require('express');
 const logger = require('@root/winston')
+const { success, failure } = require('@common/result')
 const router = express.Router();
 
 /* GET listing. */
@@ -10,8 +11,11 @@ router.get('/', function(req, res, next) {
   db.query(query.select, function(err, result){
     if(err){
       logger.error(err);
+      res.json(failure("9001", err));
     }
-    res.json(result);
+    else{
+      res.json(success(result));
+    }
   });
 });
 
@@ -25,7 +29,7 @@ router.put('/', function(req, res, next) {
 
   if(!data || data.id == undefined){
     logger.error('undefined : id');
-    res.json(0);
+    res.json(failure("9001", "undefined id"));
   }
   else{
     params = [parseInt(data.user_id), data.name, parseInt(data.amount), data.remark];
@@ -37,12 +41,12 @@ router.put('/', function(req, res, next) {
       params.push(parseInt(data.id));
     }
 
-    db.query(sql, params,function(err,rows,fields) {
+    db.query(sql, params,function(err, rows, fields) {
       if(err){
         logger.error(err);
-        res.json(0);
+        res.json(failure("9001", err));
       }else{
-        res.json(fields);
+        res.json(success(fields));
       }
     });
   }

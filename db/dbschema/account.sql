@@ -1,8 +1,10 @@
-
 CREATE TABLE user
 (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL, 
+  login_id VARCHAR(50) NOT NULL, 
+  password text,
+  account_locked   enum('N','Y') NOT NULL DEFAULT 'N', 
   PRIMARY KEY (id)
 );
 

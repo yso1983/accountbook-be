@@ -3,9 +3,14 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-
 const morgan = require('morgan');
 const logger = require('./winston');
+const session = require('express-session');
+var passport = require('passport');
+
+require('./passport').config(passport);
+require('dotenv').config();
+
 
 var app = express();
 
@@ -15,11 +20,32 @@ app.set('view engine', 'jade');
 
 app.use(express.json());
 
-app.use('/', require('./route'));
-
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+//app.use(cookieParser());
+//로그인 쿠키 관련
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(session({
+  resave:false,
+  saveUninitialized: false,
+  secret: process.env.COOKIE_SECRET,
+  cookie: {
+    httpOnly: true,
+    secure:false,
+  }
+}));
+// Passport // 2
+app.use(passport.initialize()); // req에 passport의 설정값들 적용
+app.use(passport.session()); // session 정보 저장 (req.session, req.user)
+// Custom Middlewares // 3
+// app.use(function(req,res,next){
+//   res.locals.isAuthenticated = req.isAuthenticated();
+//   res.locals.currentUser = req.user;
+//   next();
+// });
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', require('./route'));
 
 // morgan 로그 설정 
 const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 
@@ -44,5 +70,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;

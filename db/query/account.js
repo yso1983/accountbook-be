@@ -10,7 +10,7 @@ const update = `update account set
             remark = ? 
             where id = ?`;
 
-const selectUsers = `select * from user`;
+const selectUsers = `select id, name from user`;
 
 module.exports = {
   select: select,
