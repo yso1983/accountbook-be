@@ -26,7 +26,7 @@ const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             dirname: logDir,
             filename: `%DATE%.log`, // file 이름 날짜로 저장
-            maxFiles: 7,  // 30일치 로그 파일 저장
+            maxFiles: 3,  // 30일치 로그 파일 저장
             zippedArchive: true, 
         }),
       	// warn 레벨 로그를 저장할 파일 설정
@@ -44,7 +44,7 @@ const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             dirname: logDir + '/error',  // error.log 파일은 /logs/error 하위에 저장 
             filename: `%DATE%.error.log`,
-            maxFiles: 7,
+            maxFiles: 3,
             zippedArchive: true,
         }),
     ],

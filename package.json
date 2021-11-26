@@ -9,11 +9,13 @@
   },
   "_moduleAliases": {
     "@root": ".",
-    "@mariadb": "./db/mariadb.js",
+    "@mariadb": "./config/db.config.js",
     "@query": "./db/query",
     "@routes": "./routes",
-    "@passport": "./passport",
-    "@common": "./common"
+    "@passport": "./config/passport",
+    "@common": "./common",
+    "@winston": "./config/winston.js",
+    "@controllers": "./app/controllers"
   },
   "dependencies": {
     "axios": "^0.24.0",

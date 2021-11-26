@@ -1,4 +1,4 @@
-const controller = require('@controllers/accountbook/user.controller.js');
+const controller = require('@controllers/accountbook/dnw.controller.js');
 const router = require('express').Router();
 
 /* GET listing. */

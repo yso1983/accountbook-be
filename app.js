@@ -4,18 +4,17 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const logger = require('./winston');
+const logger = require('./config/winston');
 const session = require('express-session');
 var passport = require('passport');
 
-require('./passport').config(passport);
+require('./config/passport').config(passport);
 require('dotenv').config();
-
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'jade');
 
 app.use(express.json());
@@ -25,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 //로그인 쿠키 관련
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session({
-  resave:false,
+  resave: false,
   saveUninitialized: false,
   secret: process.env.COOKIE_SECRET,
   cookie: {
@@ -45,7 +44,7 @@ app.use(passport.session()); // session 정보 저장 (req.session, req.user)
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', require('./route'));
+app.use('/', require('./config/route'));
 
 // morgan 로그 설정 
 const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 

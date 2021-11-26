@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const logger = require('@root/winston')
+const logger = require('@winston')
 const { isAuth } = require('@passport/middleware')
 const { success, failure } = require('@common/result')
 

@@ -2,7 +2,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const db = require('@mariadb');
 const query= require('@query/user');
 const express = require('express');
-const logger = require('@root/winston')
+const logger = require('@winston')
 
 exports.config = (passport) => {
   passport.serializeUser((user, done) => {

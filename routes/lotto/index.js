@@ -1,9 +1,10 @@
 const db = require('@mariadb');
 const query = require('@query/lotto.js');
 const express = require('express');
-const logger = require('@root/winston')
+const logger = require('@winston')
 const router = express.Router();
 const axios = require('axios');
+const lottoCtrl = require('@controllers/lotto.controller.js');
 
 const lottoUrl = 'https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=';
 
@@ -219,13 +220,7 @@ router.get('/sync/:id', function(req, res, next) {
 
 //당첨 내역 리스트
 router.get('/', function(req, res, next) {
-  //logger.info(req);
-  db.query(query.select, function(err, result){
-    if(err){
-      logger.error(err);
-    }
-    res.json(result);
-  });
+  lottoCtrl.findAll(req, res);
 });
 
 //랜덤 추출
