@@ -8,6 +8,6 @@ exports.success = (data) => {
 exports.failure = (code, msg) => {
   return {
     code: code,
-    msg: msg
+    message: msg
   };
 };

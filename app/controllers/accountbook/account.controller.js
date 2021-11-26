@@ -1,7 +1,8 @@
-const db = require('@mariadb');
-const query = require('@query/account.js');
+const db = require("@db");
+const Account = db.account;
+const User = db.user;
 const logger = require('@winston');
-const { success, failure } = require('@common/result');
+const { success, failure } = require('@responseJson');
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
@@ -10,14 +11,24 @@ exports.create = (req, res) => {
 
 // Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
-  db.query(query.select, function(err, result){
-    if(err){
-      logger.error(err);
-      res.json(failure("9001", err));
+  Account.findAll({
+     include: [
+        {
+          model: User,
+          required: true,
+          attributes: ['username'],
+          //where: ["year_birth = post_year"]
+        }
+     ],
+  })
+  .then(result => {
+    if (!result) {
+      return res.status(404).send({ message: "User Not found." });
     }
-    else{
-      res.json(success(result));
-    }
+    res.status(200).send(success(result));
+  })
+  .catch(err => {
+    res.status(500).send(err.message);
   });
 };
 
@@ -30,32 +41,42 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
 
   let data = req.body;
-  let sql = '', params = [];
 
-  logger.info(req.body);
+  console.log(data);
 
   if(!data || data.id == undefined){
     logger.error('undefined : id');
-    res.json(failure("9001", "undefined id"));
+    res.status(200).json(failure("9001", "undefined id"));
   }
   else{
-    params = [parseInt(data.user_id), data.name, parseInt(data.amount), data.remark];
+
+    let params = { user_id: data.user_id, name: data.name, amount: data.amount, remark: data.remark };
+
     if(data.id == '0'){
-      sql = query.insert;
+      Account.create(params)
+      .then(account => {
+        if (!account) {
+          return res.status(404).send({ message: "Account Not found." });
+        }
+        res.status(200).send(success(account));
+      })
+      .catch(err => {
+        res.status(500).send(err.message);
+      });
     }
     else{
-      sql = query.update;
-      params.push(parseInt(data.id));
+      Account.update(params, {where: { id: data.id }})
+      .then(account => {
+        if (!account) {
+          return res.status(404).send({ message: "Account Not found." });
+        }
+        res.status(200).send(success(account));
+      })
+      .catch(err => {
+        res.status(500).send(err.message);
+      });
     }
 
-    db.query(sql, params,function(err, rows, fields) {
-      if(err){
-        logger.error(err);
-        res.json(failure("9001", err));
-      }else{
-        res.json(success(fields));
-      }
-    });
   }
 
 };

@@ -1,7 +1,7 @@
 const db = require('@mariadb');
 const query = require('@query/dnw.js');
 const logger = require('@winston');
-const { success, failure } = require('@common/result');
+const { success, failure } = require('@responseJson');
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
