@@ -20,7 +20,7 @@ exports.moderatorBoard = (req, res) => {
 
 exports.getUsers = (req, res) => {
   User.findAll({
-    attributes: ['name', 'email']
+    attributes: ['id', 'name', 'email']
   })
   .then(users => {
     if (!users) {

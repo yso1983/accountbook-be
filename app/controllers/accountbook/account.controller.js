@@ -16,7 +16,7 @@ exports.findAll = (req, res) => {
         {
           model: User,
           required: true,
-          attributes: ['username'],
+          attributes: ['name'],
           //where: ["year_birth = post_year"]
         }
      ],
