@@ -16,6 +16,7 @@
     "@app": "./app",
     "@controllers": "./app/controllers",
     "@db": "./app/models/index.js",
+    "@middleware": "./app/middleware",
     "@responseJson": "./app/middleware/responseJson.js"
   },
   "dependencies": {

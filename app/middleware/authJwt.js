@@ -1,42 +1,35 @@
 const jwt = require("jsonwebtoken");
-const secretKey = require('../config/auth.config').secretKey;
+const secretKey = require('@app/config/auth.config').secretKey;
 const db = require("@db");
 const User = db.user;
+const { verify, refreshVerify } = require('@middleware/jwt-util');
+const { success, failure } = require('@responseJson');
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  //const authToken = req.headers["x-access-token"];
+  const authToken = req.headers.authorization.split('Bearer ')[1];
 
-  if (!token) {
-    return res.status(403).send({
-      code:"",
-      message: "No token provided!"
-    });
+  if (!authToken) {
+    return res.status(403).send(failure("3101", "No token provided!"));
   }
   try {
-    jwt.verify(token, secretKey, (err, decoded) => {
+
+    jwt.verify(authToken, secretKey, (err, decoded) => {
       if (err) {
-        return res.status(401).send({
-          message: "Unauthorized!"
-        });
+        if (err.message === 'jwt expired') {
+            return res.status(200).send(failure("3100", "expired token"));
+        } else if (err.message === 'invalid token') {
+            return res.status(200).send(failure("3102", "invalid token"));
+        } else {
+            return res.status(200).send(failure("3103", "invalid token"));
+        }
       }
       req.userId = decoded.id;
       next();
     });
+    
   } catch (err) {
-    if (err.message === 'jwt expired') {
-        console.log('expired token');
-        return res.status(401).send({
-          message: "expired token"
-        });
-    } else if (err.message === 'invalid token') {
-        return res.status(403).send({
-          message: "invalid token"
-        });
-    } else {
-        return res.status(403).send({
-          message: "invalid token"
-        });
-    }
+    return res.status(403).send(failure("9999", err.message));
   }
 };
 
@@ -50,9 +43,7 @@ isAdmin = (req, res, next) => {
         }
       }
 
-      res.status(403).send({
-        message: "Require Admin Role!"
-      });
+      res.status(403).send(failure("3201", "Require Admin Role!"));
       return;
     });
   });
@@ -68,9 +59,7 @@ isModerator = (req, res, next) => {
         }
       }
 
-      res.status(403).send({
-        message: "Require Moderator Role!"
-      });
+      res.status(403).send(failure("3202", "Require Moderator Role!"));
     });
   });
 };
@@ -90,9 +79,7 @@ isModeratorOrAdmin = (req, res, next) => {
         }
       }
 
-      res.status(403).send({
-        message: "Require Moderator or Admin Role!"
-      });
+      res.status(403).send(failure("3203", "Require Moderator or Admin Role!"));
     });
   });
 };

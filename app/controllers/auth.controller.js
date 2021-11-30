@@ -1,9 +1,12 @@
 const db = require("@db");
-const randToken = require('rand-token');
 const jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
-const secretKey = require('../config/auth.config').secretKey;
-const options = require('../config/auth.config').options;
+const bcrypt = require("bcryptjs");
+const secretKey = require('@app/config/auth.config').secretKey;
+const options = require('@app/config/auth.config').options;
+const { sign, verify, refresh, refreshVerify } = require('@middleware/jwt-util');
+const { upsert } = require('@middleware/sequelize-util');
+const logger = require('@winston');
+const { success, failure } = require('@responseJson');
 
 const User = db.user;
 const Role = db.role;
@@ -28,18 +31,18 @@ exports.signup = (req, res) => {
           }
         }).then(roles => {
           user.setRoles(roles).then(() => {
-            res.send({ message: "User was registered successfully!" });
+            res.send( success({ message: "User was registered successfully!" }));
           });
         });
       } else {
         // user role = 1
         user.setRoles([1]).then(() => {
-          res.send({ message: "User was registered successfully!" });
+          res.send(success({ message: "User was registered successfully!" }));
         });
       }
     })
     .catch(err => {
-      res.status(500).send({ message: err.message });
+      res.status(500).send(failure("9999",err.message));
     });
 };
 
@@ -51,49 +54,91 @@ exports.signin = (req, res) => {
   })
     .then(user => {
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send(failure("1002", "User Not found." ));
       }
 
-      var passwordIsValid = bcrypt.compareSync(
+      let passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
       );
 
       if (!passwordIsValid) {
-        return res.status(401).send({
-          accessToken: null,
-          message: "Invalid Password!"
-        });
+        return res.status(401).send(failure("1008", "Invalid Password!"));
       }
 
-      const payload = {
-        idx: user.id,
-        email: user.email,
-      };
-
-      const tokenResult = {
-        //sign메소드를 통해 access token 발급!
-        token: jwt.sign(payload, secretKey, options),
-        refreshToken: randToken.uid(256)
-      };
-
-      var authorities = [];
-      user.getRoles().then(roles => {
-        for (let i = 0; i < roles.length; i++) {
-          authorities.push("ROLE_" + roles[i].name.toUpperCase());
-        }
-        res.status(200).send({
-          //id: user.id,
-          name: user.name,
-          //username: user.username,
-          email: user.email,
-          roles: authorities,
-          accessToken: tokenResult.token,
-          refreshToken: tokenResult.refreshToken
+      const token = sign(user);
+      const refreshToken = refresh();
+      
+      //토큰있으면 업데이트 한다. Insert Or Update
+      upsert(db.tokens, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
+      .then(function(result){
+        console.log("upsert : " + result);
+        let authorities = [];
+        user.getRoles().then(roles => {
+          for (let i = 0; i < roles.length; i++) {
+            authorities.push("ROLE_" + roles[i].name.toUpperCase());
+          }
+          res.status(200).send({
+            //id: user.id,
+            //username: user.username,
+            name: user.name,
+            email: user.email,
+            roles: authorities,
+            accessToken: token,
+            refreshToken: refreshToken
+          });
         });
-      });
+      })
+      .catch(err => res.status(401).send(failure("9999", err.message)));
     })
     .catch(err => {
-      res.status(500).send({ message: err.message });
+      res.status(500).send(failure("9999", err.message));
     });
+};
+
+exports.refresh = (req, res) => {
+
+  if (req.headers.authorization && req.headers.refresh) {
+    // access token과 refresh token의 존재 유무를 체크합니다.
+    const authToken = req.headers.authorization.split('Bearer ')[1];
+    const refreshToken = req.headers.refresh;
+
+    // access token 검증 -> expired여야 함.
+    const authResult = verify(authToken);
+
+    // access token 디코딩하여 user의 정보를 가져옵니다.
+    const decoded = jwt.decode(authToken);
+	
+    // 디코딩 결과가 없으면 권한이 없음을 응답.
+    if (decoded === null) {
+      res.status(401).send(failure("9999",'No authorized!'));
+    }
+	
+    /* access token의 decoding 된 값에서 유저의 id를 가져와 refresh token을 검증합니다. */
+    const refreshResult = refreshVerify(refreshToken, decoded.id);
+
+    // 재발급을 위해서는 access token이 만료되어 있어야합니다.
+    if (authResult.code !== "0000" && authResult.message === 'jwt expired') {
+      // 1. access token이 만료되고, refresh token도 만료 된 경우 => 새로 로그인해야합니다.
+      if (refreshResult === false) {
+        res.status(401).send(failure("9999",'No authorized!'));
+      } else {
+        
+        // 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급
+        const newAccessToken = sign({id : decoded.id, email: decoded.email});
+
+        // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
+        res.status(200).send(success(
+          {
+            accessToken: newAccessToken,
+            refreshToken,
+          }));
+      }
+    } else {
+      // 3. access token이 만료되지 않은경우 => refresh 할 필요가 없습니다.
+      res.status(400).send(failure("3002", 'Acess token is not expired!'));
+    }
+  } else { // access token 또는 refresh token이 헤더에 없는 경우
+    res.status(400).send(failure("3003", 'Access token and refresh token are need for refresh!'));
+  }
 };

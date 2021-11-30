@@ -27,6 +27,7 @@ db.sequelize = sequelize;
 db.user = require("@app/models/user.model.js")(sequelize, Sequelize);
 db.role = require("@app/models/role.model.js")(sequelize, Sequelize);
 db.account = require("@app/models/account.model.js")(sequelize, Sequelize);
+db.tokens = require("@app/models/tokens.model.js")(sequelize, Sequelize);
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
