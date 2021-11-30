@@ -25,14 +25,21 @@ exports.initial = () => {
     username : "yso",
     email : "yso1983@gmail.com",
     password : bcrypt.hashSync("123456", 8),
-    roles: ["moderator", "user", "admin"]
-  });
+  })
+  .then(user => {
+    user.setRoles( [1, 2, 3]).catch((err) => console.log(err));
+  })
+  .catch((err) => console.log(err));
+
   
   User.create({
     name: "봉화",
     username : "bhl",
     email : "libonghua@gmail.com",
     password : bcrypt.hashSync("123456", 8),
-    roles: ["admin"]
-  });
+  })
+  .then(user =>{
+    user.setRoles( [ 1, 2, 3]).catch((err) => console.log(err));
+  })
+  .catch((err) => console.log(err));
 }

@@ -46,7 +46,7 @@ exports.signup = (req, res) => {
 exports.signin = (req, res) => {
   User.findOne({
     where: {
-      username: req.body.username
+      email: req.body.email
     }
   })
     .then(user => {
@@ -67,7 +67,7 @@ exports.signin = (req, res) => {
       }
 
       const payload = {
-        idx: user.username,
+        idx: user.id,
         email: user.email,
       };
 
