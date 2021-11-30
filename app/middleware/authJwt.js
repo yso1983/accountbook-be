@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.js");
+const secretKey = require('../config/auth.config').secretKey;
 const db = require("@db");
 const User = db.user;
 
@@ -12,16 +12,32 @@ verifyToken = (req, res, next) => {
       message: "No token provided!"
     });
   }
-
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Unauthorized!"
-      });
+  try {
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({
+          message: "Unauthorized!"
+        });
+      }
+      req.userId = decoded.id;
+      next();
+    });
+  } catch (err) {
+    if (err.message === 'jwt expired') {
+        console.log('expired token');
+        return res.status(401).send({
+          message: "expired token"
+        });
+    } else if (err.message === 'invalid token') {
+        return res.status(403).send({
+          message: "invalid token"
+        });
+    } else {
+        return res.status(403).send({
+          message: "invalid token"
+        });
     }
-    req.userId = decoded.id;
-    next();
-  });
+  }
 };
 
 isAdmin = (req, res, next) => {

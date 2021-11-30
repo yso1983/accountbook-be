@@ -1,12 +1,14 @@
 const db = require("@db");
-const config = require("../config/auth.config");
+const randToken = require('rand-token');
+const jwt = require("jsonwebtoken");
+var bcrypt = require("bcryptjs");
+const secretKey = require('../config/auth.config').secretKey;
+const options = require('../config/auth.config').options;
+
 const User = db.user;
 const Role = db.role;
 
 const Op = db.Sequelize.Op;
-
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
   // Save User to Database
@@ -64,9 +66,16 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 86400 // 24 hours
-      });
+      const payload = {
+        idx: user.username,
+        email: user.email,
+      };
+
+      const tokenResult = {
+        //sign메소드를 통해 access token 발급!
+        token: jwt.sign(payload, secretKey, options),
+        refreshToken: randToken.uid(256)
+      };
 
       var authorities = [];
       user.getRoles().then(roles => {
@@ -74,12 +83,13 @@ exports.signin = (req, res) => {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
         res.status(200).send({
-          id: user.id,
+          //id: user.id,
           name: user.name,
-          username: user.username,
+          //username: user.username,
           email: user.email,
           roles: authorities,
-          accessToken: token
+          accessToken: tokenResult.token,
+          refreshToken: tokenResult.refreshToken
         });
       });
     })

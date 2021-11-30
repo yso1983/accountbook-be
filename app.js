@@ -8,27 +8,33 @@ const logger = require('./config/winston');
 const session = require('express-session');
 const cors = require("cors");
 
-var corsOptions = {
-  origin: "http://localhost:3001"
-};
-
 require('dotenv').config();
 
 var app = express();
+
+const whitelist = ["http://localhost:8080", "http://yso1983.gq", "http://localhost:3000"];
+const corsOptions = {
+  // origin: function (origin, callback) {
+  //   console.log("corsOptions : " + origin);
+  //   if (whitelist.indexOf(origin) !== -1) {
+  //     callback(null, true);
+  //   } else {
+  //     callback(new Error("Not Allowed Origin!"));
+  //   }
+  // },
+};
 
 app.use(cors(corsOptions));
 
 const db = require("./app/models");
 
-
 //For production, just insert these rows manually and use sync() without parameters to avoid dropping data:
-db.sequelize.sync();
-const Role = db.role;
-const User = db.user;
-// db.sequelize.sync({force: true}).then(() => {
-//   console.log('Drop and Resync Db');
-//   initial();
-// });
+//db.sequelize.sync();
+
+db.sequelize.sync({force: true}).then(() => {
+  console.log('Drop and Resync Db');
+  require("./app/config/dev.initial.data").initial();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'app/views'));
@@ -41,6 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 require('./config/routes')(app);
 
@@ -65,30 +72,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-function initial() {
-  Role.create({
-    id: 1,
-    name: "user"
-  });
- 
-  Role.create({
-    id: 2,
-    name: "moderator"
-  });
- 
-  Role.create({
-    id: 3,
-    name: "admin"
-  });
-
-  User.create({
-    name: "용수",
-    username : "yso",
-    email : "yso1983@gmail.com",
-    password : "123456",
-    roles: ["moderator", "user", "admin"]
-  });
-}
 
 module.exports = app;
