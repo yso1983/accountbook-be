@@ -2,7 +2,7 @@ const db = require("@db");
 const Account = db.account;
 const User = db.user;
 const logger = require('@winston');
-const { success, failure } = require('@responseJson');
+const { success, failure } = require('@middleware').responseJson;
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {

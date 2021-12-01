@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 const secretKey = require('@app/config/auth.config').secretKey;
 const db = require("@db");
 const User = db.user;
-const { verify, refreshVerify } = require('@middleware/jwt-util');
-const { success, failure } = require('@responseJson');
+const { success, failure } = require("./responseJson");
 
 verifyToken = (req, res, next) => {
   //const authToken = req.headers["x-access-token"];

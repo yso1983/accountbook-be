@@ -16,8 +16,7 @@
     "@app": "./app",
     "@controllers": "./app/controllers",
     "@db": "./app/models/index.js",
-    "@middleware": "./app/middleware",
-    "@responseJson": "./app/middleware/responseJson.js"
+    "@middleware": "./app/middleware"
   },
   "dependencies": {
     "axios": "^0.24.0",

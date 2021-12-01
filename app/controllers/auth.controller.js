@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const secretKey = require('@app/config/auth.config').secretKey;
 const options = require('@app/config/auth.config').options;
-const { sign, verify, refresh, refreshVerify } = require('@middleware/jwt-util');
-const { upsert } = require('@middleware/sequelize-util');
+const { sign, verify, refresh, refreshVerify } = require('@middleware').jwtUtil;
+const { upsert } = require('@middleware').sequelizeUtil;
 const logger = require('@winston');
-const { success, failure } = require('@responseJson');
+const { success, failure } = require('@middleware').responseJson;
 
 const User = db.user;
 const Role = db.role;
