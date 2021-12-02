@@ -1,4 +1,4 @@
-const { authJwt } = require("../middleware");
+const { verifyToken } = require("@middleware").authJwt;
 const controller = require("@controllers").account;
 
 module.exports = function(app) {
@@ -12,13 +12,13 @@ module.exports = function(app) {
   
   app.get(
     "/api/accounts",
-    [authJwt.verifyToken],
+    [verifyToken],
     controller.findAll
   );
 
   app.put(
-    "/api/account",
-    [authJwt.verifyToken],
+    "/api/accounts",
+    [verifyToken],
     controller.update
   );
 };

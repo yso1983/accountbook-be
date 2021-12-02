@@ -4,14 +4,10 @@ const User = db.user;
 const logger = require('@winston');
 const { success, failure } = require('@middleware').responseJson;
 
-// Create and Save a new Tutorial
-exports.create = (req, res) => {
-  
-};
-
-// Retrieve all Tutorials from the database.
-exports.findAll = (req, res) => {
-  Account.findAll({
+function fn_findAllCondition(req){
+  console.log(req.query);
+  if(req.query.userid){
+    return {
      include: [
         {
           model: User,
@@ -19,8 +15,28 @@ exports.findAll = (req, res) => {
           attributes: ['name'],
           //where: ["year_birth = post_year"]
         }
-     ],
-  })
+      ],
+      where: {
+        user_id: req.query.userid
+      }
+     };
+  }else{
+    return {
+     include: [
+        {
+          model: User,
+          required: true,
+          attributes: ['name'],
+          //where: ["year_birth = post_year"]
+        }
+      ]
+     };
+  }
+}
+
+// Retrieve all Tutorials from the database.
+exports.findAll = (req, res) => {
+  Account.findAll(fn_findAllCondition(req))
   .then(result => {
     if (!result) {
       return res.status(404).send({ message: "User Not found." });
@@ -32,10 +48,6 @@ exports.findAll = (req, res) => {
   });
 };
 
-// Find a single Tutorial with an id
-exports.findOne = (req, res) => {
-  
-};
 
 // Update a Tutorial by the id in the request
 exports.update = (req, res) => {

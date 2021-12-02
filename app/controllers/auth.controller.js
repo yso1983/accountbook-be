@@ -72,14 +72,14 @@ exports.signin = (req, res) => {
     //토큰있으면 업데이트 한다. Insert Or Update
     upsert(db.token, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
     .then(function(result){
-      console.log("upsert : " + result);
+      
       let authorities = [];
       user.getRoles().then(roles => {
         for (let i = 0; i < roles.length; i++) {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
         res.status(200).send({
-          //id: user.id,
+          id: user.id,
           //username: user.username,
           name: user.name,
           email: user.email,
@@ -89,7 +89,7 @@ exports.signin = (req, res) => {
         });
       });
     })
-    .catch(err => res.status(401).send(failure("9999", err.message)));
+    .catch(err => res.status(401).send(failure("8001", err.message)));
   })
   .catch(err => {
     res.status(500).send(failure("9999", err.message));
@@ -111,7 +111,7 @@ exports.refresh = (req, res) => {
 	
     // 디코딩 결과가 없으면 권한이 없음을 응답.
     if (decoded === null) {
-      res.status(401).send(failure("9999",'No authorized!'));
+      res.status(401).send(failure("3001",'No authorized!'));
     }
 	
     /* access token의 decoding 된 값에서 유저의 id를 가져와 refresh token을 검증합니다. */
@@ -121,7 +121,7 @@ exports.refresh = (req, res) => {
     if (authResult.code !== "0000" && authResult.message === 'jwt expired') {
       // 1. access token이 만료되고, refresh token도 만료 된 경우 => 새로 로그인해야합니다.
       if (refreshResult === false) {
-        res.status(401).send(failure("9999",'No authorized!'));
+        res.status(401).send(failure("3002",'No authorized!'));
       } else {
         
         // 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급

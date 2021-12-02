@@ -11,11 +11,11 @@
     "@root": ".",
     "@mariadb": "./config/mariadb.config.js",
     "@query": "./db/query",
-    "@routes": "./routes",
+    "@routes": "./app/routes",
     "@winston": "./config/winston.js",
     "@app": "./app",
     "@controllers": "./app/controllers",
-    "@db": "./app/models/index.js",
+    "@db": "./app/models",
     "@middleware": "./app/middleware"
   },
   "dependencies": {

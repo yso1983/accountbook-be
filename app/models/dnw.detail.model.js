@@ -8,6 +8,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: { model: 'dnw_items', key: 'id' }
     },
+    created_user_id : {
+      type: Sequelize.INTEGER,
+      allowNull: false
+    },
     amount : {
       type: Sequelize.DECIMAL(18,2),
       allowNull: false,

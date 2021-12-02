@@ -12,9 +12,10 @@ module.exports = function(db) {
 
   db.user.hasMany(db.account, {foreignKey: 'user_id'});
   db.account.belongsTo(db.user, {foreignKey: 'user_id'});
-  db.account.hasMany(db.dnwDetail, {foreignKey: 'account_id'});
+
   db.dnwItem.hasMany(db.dnwDetail, {foreignKey: 'dnw_item_id'});
-  db.dnwDetail.belongsTo(db.account, {foreignKey: 'account_id'});
   db.dnwDetail.belongsTo(db.dnwItem, {foreignKey: 'dnw_item_id'});
 
+  db.account.hasMany(db.dnwDetail, {foreignKey: 'account_id'});
+  db.dnwDetail.belongsTo(db.account, {foreignKey: 'account_id'});
 };
