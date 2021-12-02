@@ -52,48 +52,48 @@ exports.signin = (req, res) => {
       email: req.body.email
     }
   })
-    .then(user => {
-      if (!user) {
-        return res.status(404).send(failure("1002", "User Not found." ));
-      }
+  .then(user => {
+    if (!user) {
+      return res.status(404).send(failure("1002", "User Not found." ));
+    }
 
-      let passwordIsValid = bcrypt.compareSync(
-        req.body.password,
-        user.password
-      );
+    let passwordIsValid = bcrypt.compareSync(
+      req.body.password,
+      user.password
+    );
 
-      if (!passwordIsValid) {
-        return res.status(401).send(failure("1008", "Invalid Password!"));
-      }
+    if (!passwordIsValid) {
+      return res.status(401).send(failure("1008", "Invalid Password!"));
+    }
 
-      const token = sign(user);
-      const refreshToken = refresh();
-      
-      //토큰있으면 업데이트 한다. Insert Or Update
-      upsert(db.tokens, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
-      .then(function(result){
-        console.log("upsert : " + result);
-        let authorities = [];
-        user.getRoles().then(roles => {
-          for (let i = 0; i < roles.length; i++) {
-            authorities.push("ROLE_" + roles[i].name.toUpperCase());
-          }
-          res.status(200).send({
-            //id: user.id,
-            //username: user.username,
-            name: user.name,
-            email: user.email,
-            roles: authorities,
-            accessToken: token,
-            refreshToken: refreshToken
-          });
+    const token = sign(user);
+    const refreshToken = refresh();
+    
+    //토큰있으면 업데이트 한다. Insert Or Update
+    upsert(db.token, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
+    .then(function(result){
+      console.log("upsert : " + result);
+      let authorities = [];
+      user.getRoles().then(roles => {
+        for (let i = 0; i < roles.length; i++) {
+          authorities.push("ROLE_" + roles[i].name.toUpperCase());
+        }
+        res.status(200).send({
+          //id: user.id,
+          //username: user.username,
+          name: user.name,
+          email: user.email,
+          roles: authorities,
+          accessToken: token,
+          refreshToken: refreshToken
         });
-      })
-      .catch(err => res.status(401).send(failure("9999", err.message)));
+      });
     })
-    .catch(err => {
-      res.status(500).send(failure("9999", err.message));
-    });
+    .catch(err => res.status(401).send(failure("9999", err.message)));
+  })
+  .catch(err => {
+    res.status(500).send(failure("9999", err.message));
+  });
 };
 
 exports.refresh = (req, res) => {

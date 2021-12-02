@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const secretKey = require('@app/config/auth.config').secretKey;
 const options = require('@app/config/auth.config').option;
 const db = require("@db");
-const Tokens = db.tokens;
+const Tokens = db.token;
 
 module.exports = {
   sign: (user) => { // access token 발급
