@@ -4,6 +4,9 @@ const { success, failure } = require('@middleware').responseJson;
 const { upsert } = require('@middleware').sequelizeUtil;
 const DnwItem = db.dnwItem;
 const DnwDetail = db.dnwDetail;
+const moment = require('moment-timezone');
+
+const Op = db.Sequelize.Op;
 
 // Create and Save a new Tutorial
 exports.createItem = (req, res) => {
@@ -79,27 +82,47 @@ exports.createDetail = (req, res) => {
     .catch(err => res.status(401).send(failure("9999", err.message)));
 };
 
-// Find a single Tutorial with an id
-exports.findOne = (req, res) => {
-  
-};
+exports.findDetailsByMonth = (req, res) => {
+  let startDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), (parseInt(req.params.month.replace('-', '').substring(4)) - 1), 1, 0, 0, 0))
+    .tz('Asia/Seoul').format();
+  let endDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), (req.params.month.replace('-', '').substring(4)), 1, 0, 0, 0))
+    .tz('Asia/Seoul').format();
 
-// Update a Tutorial by the id in the request
-exports.update = (req, res) => {
+  //console.log(req.params.month, startDt, endDt);
 
-};
-
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
-  
-};
-
-// Delete all Tutorials from the database.
-exports.deleteAll = (req, res) => {
-  
-};
-
-// Find all published Tutorials
-exports.findAllPublished = (req, res) => {
-  
+  DnwDetail.findAll({
+     include: [
+        {
+          model: db.account,
+          required: true,
+          attributes: ['name'],
+          include: [
+            {
+              model: db.user,
+              required: true,
+              attributes: ['name'],
+            },
+          ]
+        },
+        {
+          model: DnwItem,
+          required: true,
+          attributes: ['name'],
+        },
+     ],
+      where: {
+        standard_dt: {
+          [Op.between]: [startDt, endDt], 
+        }
+      }
+  })
+  .then(details => {
+    if (!details) {
+      return res.status(404).send({ message: "Not found." });
+    }
+    res.status(200).send(success(details));
+  })
+  .catch(err => {
+    res.status(500).send(err.message);
+  });
 };
