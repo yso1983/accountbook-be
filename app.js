@@ -29,12 +29,12 @@ app.use(cors(corsOptions));
 const db = require("./app/models");
 
 //For production, just insert these rows manually and use sync() without parameters to avoid dropping data:
-db.sequelize.sync();
+//db.sequelize.sync();
 
-// db.sequelize.sync({force: true}).then(() => {
-//   console.log('Drop and Resync Db');
-//   require("./app/config/dev.initial.data").initial();
-// });
+db.sequelize.sync({force: true}).then(() => {
+  console.log('Drop and Resync Db');
+  require("./app/config/dev.initial.data").initial();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'app/views'));

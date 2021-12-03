@@ -2,10 +2,11 @@ const db = require("@db");
 const logger = require('@winston');
 const { success, failure } = require('@middleware').responseJson;
 const { upsert } = require('@middleware').sequelizeUtil;
-const DnwItem = db.dnwItem;
-const DnwDetail = db.dnwDetail;
 const moment = require('moment-timezone');
 
+const DnwDetail = db.dnwDetail;
+const DnwItem = db.dnwItem;
+const Account = db.account;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Tutorial
@@ -70,16 +71,54 @@ exports.createDetail = (req, res) => {
     account_id: req.body.account_id, 
     dnw_item_id: req.body.dnw_item_id, 
     created_user_id: req.body.user_id, 
-    amount: req.body.amount, 
+    amount: parseFloat(req.body.amount), 
     standard_dt: req.body.standard_dt, 
     remark: req.body.remark  
   };
+  
+  Account.findOne({
+    where: {
+      id: params.account_id
+    }
+  })
+  .then(account => {
 
-  upsert(DnwDetail, params, { id: req.body.id })
-    .then(result => {
-       res.status(200).send(success(result));
+    let accountParams = {
+      id : account.id,
+      amount : (parseFloat(account.amount) + parseFloat(params.amount)),
+      user_id : account.user_id,
+      name : account.name,
+      remark : account.remark
+    };
+
+    db.sequelize.transaction()
+    .then(t => { 
+      console.log(accountParams);
+      
+      return account.update(accountParams, { transaction: t })
+        .then(result => { 
+          console.log(params);
+
+          return DnwDetail.create(params, {transaction: t}); 
+        })
+        .then((result) => { 
+          t.commit(); //커밋 
+
+          return res.status(200).send(success(result));
+        }).catch((err) => { 
+          console.log(err.message);
+          t.rollback(); //롤백 설정 
+          return res.status(401).send(failure("9998", err.message));
+        }); 
+
     })
     .catch(err => res.status(401).send(failure("9999", err.message)));
+  });
+  // upsert(DnwDetail, params, { id: req.body.id })
+  //   .then(result => {
+  //      res.status(200).send(success(result));
+  //   })
+  //   .catch(err => res.status(401).send(failure("9999", err.message)));
 };
 
 exports.findDetailsByMonth = (req, res) => {

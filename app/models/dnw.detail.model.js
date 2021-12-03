@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   return sequelize.define("dnw_details", {
     account_id : {
       type: Sequelize.INTEGER,
-      references: { model: 'account', key: 'id' }
+      references: { model: 'accounts', key: 'id' },
     },
     dnw_item_id : {
       type: Sequelize.INTEGER,
