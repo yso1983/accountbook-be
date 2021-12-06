@@ -1,11 +1,10 @@
 const mariadb = require('mysql');
 
 const db = mariadb.createConnection({
-    //host: '132.226.16.13',
-    host: 'localhost',
-    user: 'yso1983',
-    password: '123456',
-    database: 'accountbook',
+    host: process.env.DB_CONN_HOST,
+    user: process.env.DB_CONN_USER,
+    password: process.env.DB_CONN_PASSWORD,
+    database: process.env.DB_CONN_DATABASE,
     connectionLimit: 5
 });
 
