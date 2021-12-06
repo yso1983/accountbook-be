@@ -9,9 +9,9 @@ module.exports = {
       // env: { // 환경변수. 모든 배포 환경에서 공통으로 사용한다.
       //   NODE_ENV: 'development', //production
       // },
-      //wait_ready: true,
-      listen_timeout: 50000,
-      kill_timeout: 5000,
+      // wait_ready: true,
+      //listen_timeout: 50000,
+      //kill_timeout: 5000,
       // env_staging: { // staging 배포 환경에서만 사용할 환경 변수
       //   API_ROOT: 'http://api.server.name'
       // },

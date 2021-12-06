@@ -18,4 +18,11 @@ module.exports = function(db) {
 
   db.account.hasMany(db.dnwDetail, {foreignKey: 'account_id'});
   db.dnwDetail.belongsTo(db.account, {foreignKey: 'account_id'});
+
+  db.dnwItem.hasMany(db.automaticDnw, {foreignKey: 'dnw_item_id'});
+  db.automaticDnw.belongsTo(db.dnwItem, {foreignKey: 'dnw_item_id'});
+
+  db.account.hasMany(db.automaticDnw, {foreignKey: 'account_id'});
+  db.automaticDnw.belongsTo(db.account, {foreignKey: 'account_id'});
+  
 };

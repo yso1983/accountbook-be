@@ -39,7 +39,7 @@ exports.initial = () => {
     password : bcrypt.hashSync("123456", 8),
   })
   .then(user =>{
-    user.setRoles( [ 1, 2, 3]).catch((err) => console.log(err));
+    user.setRoles( [ 1, 2]).catch((err) => console.log(err));
   })
   .catch((err) => console.log(err));
 }

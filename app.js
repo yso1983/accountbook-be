@@ -35,7 +35,7 @@ console.log("[SCHEDULE_VAR] ", process.env.SCHEDULE_VAR);
 
 if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   
-  if(process.env.NODE_ENV !== "production" )
+  if(false && process.env.NODE_ENV !== "production" )
   {
     db.sequelize.sync({force: true}).then(() => {
       console.log('Drop and Resync Db');
@@ -47,7 +47,7 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   };
 	// schedule your job here.
   const job = schedule.scheduleJob('10 * * * * *', function(){
-    console.log('The answer to life, the universe, and everything!');
+     require("./app/schedules/dnw.detail").start();
   });
 }
 

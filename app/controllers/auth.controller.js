@@ -142,3 +142,7 @@ exports.refresh = (req, res) => {
     res.status(400).send(failure("3003", 'Access token and refresh token are need for refresh!'));
   }
 };
+
+exports.check = (req, res) => {
+  res.status(200).send(success("token is valid!"));
+}
