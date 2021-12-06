@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const logger = require('./config/winston');
 const session = require('express-session');
 const cors = require("cors");
+const schedule = require('node-schedule');
 
 require('dotenv').config();
 
@@ -33,6 +34,7 @@ console.log("[NODE_ENV] ", process.env.NODE_ENV);
 console.log("[SCHEDULE_VAR] ", process.env.SCHEDULE_VAR);
 
 if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
+  
   if(process.env.NODE_ENV !== "production" )
   {
     db.sequelize.sync({force: true}).then(() => {
@@ -44,6 +46,9 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
     db.sequelize.sync();
   };
 	// schedule your job here.
+  const job = schedule.scheduleJob('10 * * * * *', function(){
+    console.log('The answer to life, the universe, and everything!');
+  });
 }
 
 // view engine setup
