@@ -30,8 +30,6 @@ app.use(cors(corsOptions));
 const db = require("./app/models");
 
 //For production, just insert these rows manually and use sync() without parameters to avoid dropping data:
-console.log("[NODE_ENV] ", process.env.NODE_ENV);
-console.log("[SCHEDULE_VAR] ", process.env.SCHEDULE_VAR);
 
 if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   

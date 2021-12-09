@@ -3,6 +3,7 @@ const logger = require('@winston');
 const { success, failure } = require('@middleware').responseJson;
 const { upsert } = require('@middleware').sequelizeUtil;
 const moment = require('moment-timezone');
+const commFunc =  require('@middleware').commFunc;
 
 const DnwDetail = db.dnwDetail;
 const DnwItem = db.dnwItem;
@@ -71,7 +72,7 @@ exports.createDetail = (req, res) => {
     account_id: req.body.account_id, 
     dnw_item_id: req.body.dnw_item_id, 
     created_user_id: req.body.user_id, 
-    amount: parseFloat(req.body.amount), 
+    amount: commFunc.parseFloat(req.body.amount), 
     standard_dt: req.body.standard_dt, 
     remark: req.body.remark  
   };

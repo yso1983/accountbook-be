@@ -3,6 +3,7 @@ const Account = db.account;
 const User = db.user;
 const logger = require('@winston');
 const { success, failure } = require('@middleware').responseJson;
+const commFunc =  require('@middleware').commFunc;
 
 function fn_findAllCondition(req){
   console.log(req.query);
@@ -62,7 +63,7 @@ exports.update = (req, res) => {
   }
   else{
 
-    let params = { user_id: data.user_id, name: data.name, amount: data.amount, remark: data.remark };
+    let params = { user_id: data.user_id, name: data.name, amount: commFunc.parseFloat(data.amount), remark: data.remark };
 
     if(data.id == '0'){
       Account.create(params)
