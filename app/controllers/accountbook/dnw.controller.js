@@ -60,8 +60,8 @@ exports.findAllDetails = (req, res) => {
         },
      ],
       order: [
-            ['id', 'DESC']
-        ],
+        ['id', 'DESC']
+      ],
   })
   .then(details => {
     if (!details) {
@@ -249,7 +249,10 @@ exports.findDetailsByMonth = (req, res) => {
         standard_dt: {
           [Op.between]: [startDt, endDt], 
         }
-      }
+      },
+      order: [
+        ['id', 'DESC']
+      ],
   })
   .then(details => {
     if (!details) {
