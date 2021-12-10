@@ -45,7 +45,10 @@ exports.findAll = (req, res) => {
           required: true,
           attributes: ['name'],
         },
-     ]
+     ],
+      order: [
+            ['id', 'DESC']
+        ],
   })
   .then(result => {
     if (!result) {

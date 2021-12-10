@@ -22,7 +22,11 @@ exports.createItem = (req, res) => {
 
 // Retrieve all Tutorials from the database.
 exports.findAllItem = (req, res) => {
-  DnwItem.findAll()
+  DnwItem.findAll({
+    order: [
+            ['id', 'DESC']
+        ],
+  })
   .then(items => {
     if (!items) {
       return res.status(404).send({ message: "Item Not found." });
@@ -55,6 +59,9 @@ exports.findAllDetails = (req, res) => {
           attributes: ['name'],
         },
      ],
+      order: [
+            ['id', 'DESC']
+        ],
   })
   .then(details => {
     if (!details) {
@@ -79,6 +86,10 @@ exports.createDetail = (req, res) => {
 
   const to_account_id = req.body.to_account_id;
   if(to_account_id && commFunc.parseFloat(to_account_id) > 0){
+    if(params.account_id == to_account_id){
+      return res.status(401).send(failure("9991", "입금하는 계좌랑 출금하는 계좌가 동일합니다."));
+    }
+
     createDetailFromAndTo(params, to_account_id, res) ;
   }
   else{
