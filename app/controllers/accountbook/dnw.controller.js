@@ -9,6 +9,7 @@ const DnwDetail = db.dnwDetail;
 const DnwItem = db.dnwItem;
 const Account = db.account;
 const Op = db.Sequelize.Op;
+const sequelize = db.sequelize;
 
 // Create and Save a new Tutorial
 exports.createItem = (req, res) => {
@@ -23,9 +24,19 @@ exports.createItem = (req, res) => {
 // Retrieve all Tutorials from the database.
 exports.findAllItem = (req, res) => {
   DnwItem.findAll({
-    order: [
-            ['id', 'DESC']
-        ],
+    attributes: {
+      include: [
+        [sequelize.fn('COUNT', sequelize.col('dnw_details.id')), 'count']
+      ]
+    },
+    include: [{
+      attributes: [],
+      model:DnwDetail,
+      duplicating: false,
+      required: false
+    }],
+    group: ['dnw_items.id'],
+    order: [[sequelize.literal('count'), 'DESC'], ['id', 'DESC']]
   })
   .then(items => {
     if (!items) {
