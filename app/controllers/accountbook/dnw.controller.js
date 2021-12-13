@@ -157,7 +157,6 @@ function createOnlyDetail(params, res) {
 
 function createDetailFromAndTo(params, to_account_id, res) {
 
-
   Account.findOne({
     where: {
       id: params.account_id
@@ -279,4 +278,42 @@ exports.findDetailsByMonth = (req, res) => {
   .catch(err => {
     res.status(500).send(err.message);
   });
+};
+
+exports.getDnwChartLastFewDays = (req, res) => {
+  const day = commFunc.parseFloat(req.params.day ?? 7);
+  let startDt = moment(commFunc.addDays(new Date(), (0 - day))).tz('Asia/Seoul').format();
+  let endDt = moment(new Date()).tz('Asia/Seoul').format();
+
+  DnwDetail.findAll({
+    attributes: [
+      [sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d'), 'day'], 
+      [sequelize.literal(`SUM(CASE WHEN amount >= 0  THEN amount ELSE 0 END)`), 'plus'],
+      [sequelize.literal(`SUM(CASE WHEN amount < 0  THEN amount ELSE 0 END)`), 'minus'],
+      //[sequelize.fn('sum', sequelize.col('amount')), 'total']
+    ],
+    group :[sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d')],
+    raw: true,
+    where: {
+      // amount: {
+      //   [Op.lt]: 0
+      // },
+      standard_dt: {
+        [Op.between]: [startDt, endDt], 
+      }
+    },
+    order: sequelize.literal('day DESC')
+  })
+  .then(details => {
+
+
+    if (!details) {
+      return res.status(404).send({ message: "Not found." });
+    }
+    res.status(200).send(success(details));
+  })
+  .catch(err => {
+    res.status(500).send(err.message);
+  });
+
 };

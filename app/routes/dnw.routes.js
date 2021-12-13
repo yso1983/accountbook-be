@@ -17,5 +17,6 @@ module.exports = function(app) {
   app.put( "/api/dnw/details", [verifyToken], controller.createDetail);
   
   app.get( "/api/dnw/:month/details", [verifyToken], controller.findDetailsByMonth);
+  app.get( "/api/dnw/:day/chart", [verifyToken], controller.getDnwChartLastFewDays);
 
 };

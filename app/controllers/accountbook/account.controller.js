@@ -6,7 +6,6 @@ const { success, failure } = require('@middleware').responseJson;
 const commFunc =  require('@middleware').commFunc;
 
 function fn_findAllCondition(req){
-  console.log(req.query);
   if(req.query.userid){
     return {
      include: [
@@ -55,8 +54,6 @@ exports.update = (req, res) => {
 
   let data = req.body;
 
-  console.log(data);
-
   if(!data || data.id == undefined){
     logger.error('undefined : id');
     res.status(200).json(failure("9001", "undefined id"));
@@ -92,19 +89,4 @@ exports.update = (req, res) => {
 
   }
 
-};
-
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
-  
-};
-
-// Delete all Tutorials from the database.
-exports.deleteAll = (req, res) => {
-  
-};
-
-// Find all published Tutorials
-exports.findAllPublished = (req, res) => {
-  
 };
