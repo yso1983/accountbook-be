@@ -22,19 +22,19 @@ exports.start = async () => {
       if (results) {
         
         results.forEach(automatic => {
-
-          db.dnwDetail.findOne({
+          //오늘 실행 로그 조회
+          db.autoDnwExecLog.findOne({
             where: {
-              account_id: automatic.account_id,
-              dnw_item_id: automatic.dnw_item_id,
+              automatic_id: automatic.id,
+              seccess_yn: 'Y',
               standard_dt: date.format('YYYY-MM-DD')
             }
           })
-          .then(detail => {
+          .then(log => {
             
-            logger.info(`[schedule:dnw.detail] - ${detail.id} EXIST: ${(detail ? true : false)}`);
+            logger.info(`[schedule:exec log] - automatic = ${automatic.id} EXIST: ${(log ? true : false)}`);
 
-            if(!detail){
+            if(!log){
               let params = { 
                 account_id: automatic.account_id, 
                 dnw_item_id: automatic.dnw_item_id, 
@@ -44,16 +44,14 @@ exports.start = async () => {
                 remark: 'schedule' 
               };
 
-              setDnwDetail(params)
-              .then(success =>logger.info("[schedule:dnw.detail] - SUCCESS: " + success))
-              .catch(err => logger.error("[schedule:dnw.detail] - ERROR: " + err.message));
+              setDnwDetail(params, automatic.id);
             }
             else{
-              logger.info("[schedule:dnw.detail] - SUCCESS: already exist");
+              logger.info("[schedule:exec log] - SUCCESS: already exist");
             }
 
           })
-          .catch(err => logger.error("[schedule:dnw.detail] - ERROR: " + err.message));
+          .catch(err => logger.error("[schedule:exec log] - ERROR: " + err.message));
 
         });
 
@@ -72,7 +70,7 @@ exports.start = async () => {
   }
 }
 
-setDnwDetail = (params) => {
+setDnwDetail = (params, automatic_id) => {
   //return new Promise(
   db.account.findOne({
     where: {
@@ -96,18 +94,27 @@ setDnwDetail = (params) => {
       
       return account.update(accountParams, { transaction: t })
         .then(result => { 
-          console.log(params);
-
+          logger.info(params);
           return db.dnwDetail.create(params, {transaction: t}); 
         })
+        .then(result => {
+          return db.autoDnwExecLog.create({automatic_id : automatic_id, seccess_yn : 'Y', standard_dt: params.standard_dt}, {transaction: t});
+        })
         .then((result) => { 
-          return t.commit(); //커밋 
+          t.commit(); //커밋 
+          logger.info("[schedule:dnw.detail] - SUCCESS: OK");
+          return result;
         }).catch((err) => { 
-          logger.err(err.message);
-          return t.rollback(); //롤백 설정 
+          logger.error("[schedule:dnw.detail] - ERROR: " + err.message);
+          t.rollback(); //롤백 설정 
+          db.autoDnwExecLog.create({automatic_id : automatic_id, seccess_yn : 'N', standard_dt: params.standard_dt, error_msg : err.message});
+          return err;
         }); 
 
     })
-    .catch(err => logger.err(err.message));
+    .catch(err => {
+      logger.error("[schedule:dnw.detail] - ERROR: " + err.message);
+      db.autoDnwExecLog.create({automatic_id : automatic_id, seccess_yn : 'N', error_msg : err.message});
+    });
   });
 }

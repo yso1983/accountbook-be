@@ -25,4 +25,6 @@ module.exports = function(db) {
   db.account.hasMany(db.automaticDnw, {foreignKey: 'account_id'});
   db.automaticDnw.belongsTo(db.account, {foreignKey: 'account_id'});
   
+  db.automaticDnw.hasMany(db.autoDnwExecLog, {foreignKey: 'automatic_id'});
+  db.autoDnwExecLog.belongsTo(db.automaticDnw, {foreignKey: 'automatic_id'});
 };

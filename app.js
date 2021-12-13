@@ -43,6 +43,7 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   else{
     db.sequelize.sync();
   };
+
 	// schedule your job here.
   const job = schedule.scheduleJob('00 30 * * * *', function(){
      require("./app/schedules/dnw.detail").start();

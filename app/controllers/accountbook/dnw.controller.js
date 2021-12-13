@@ -127,17 +127,13 @@ function createOnlyDetail(params, res) {
 
     db.sequelize.transaction()
     .then(t => { 
-      console.log(accountParams);
+      logger.info(accountParams);
       
       return account.update(accountParams, { transaction: t })
         .then(result => { 
-          console.log(params);
+          logger.info(params);
 
           return DnwDetail.create(params, {transaction: t}); 
-        })
-        .then(result => {
-
-
         })
         .then((result) => { 
 
@@ -145,13 +141,16 @@ function createOnlyDetail(params, res) {
 
           return res.status(200).send(success(result));
         }).catch((err) => { 
-          console.log(err.message);
+          logger.error(err.message);
           t.rollback(); //롤백 설정 
           return res.status(401).send(failure("9998", err.message));
         }); 
 
     })
-    .catch(err => res.status(401).send(failure("9999", err.message)));
+    .catch(err => {
+      logger.error(err.message);
+      res.status(401).send(failure("9999", err.message));
+    });
   });
 }
 
@@ -191,16 +190,15 @@ function createDetailFromAndTo(params, to_account_id, res) {
 
       db.sequelize.transaction()
       .then(t => { 
-        console.log(accountParams);
+        logger.info(accountParams);
         
         return account.update(accountParams, { transaction: t })
           .then(result => { 
-            console.log(params);
+            logger.info(params);
 
             return DnwDetail.create(params, {transaction: t}); 
           })
           .then(result => {
-            
             return toAccount.update(toAccountParams, { transaction: t });
           })
           .then(result => { 
@@ -215,16 +213,23 @@ function createDetailFromAndTo(params, to_account_id, res) {
 
             return res.status(200).send(success(result));
           }).catch((err) => { 
-            console.log(err.message);
+            logger.error(err.message);
             t.rollback(); //롤백 설정 
             return res.status(401).send(failure("9998", err.message));
           }); 
 
       })
-      .catch(err => res.status(401).send(failure("9997", err.message)));
+      .catch(err => {
+        logger.error(err.message);
+        return res.status(401).send(failure("9997", err.message));
+      
+      });
 
     })
-    .catch(err => res.status(401).send(failure("9999", err.message)));
+    .catch(err =>{
+      logger.error(err.message);
+      return res.status(401).send(failure("9999", err.message));
+    });
   });
 }
 
@@ -234,7 +239,7 @@ exports.findDetailsByMonth = (req, res) => {
   let endDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), (req.params.month.replace('-', '').substring(4)), 1, 0, 0, 0))
     .tz('Asia/Seoul').format();
 
-  //console.log(req.params.month, startDt, endDt);
+  //logger.info(req.params.month, startDt, endDt);
 
   DnwDetail.findAll({
      include: [
