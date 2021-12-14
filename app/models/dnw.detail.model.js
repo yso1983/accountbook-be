@@ -2,10 +2,12 @@ module.exports = (sequelize, Sequelize) => {
   return sequelize.define("dnw_details", {
     account_id : {
       type: Sequelize.INTEGER,
+      allowNull: false,
       references: { model: 'accounts', key: 'id' },
     },
     dnw_item_id : {
       type: Sequelize.INTEGER,
+      allowNull: false,
       references: { model: 'dnw_items', key: 'id' }
     },
     created_user_id : {

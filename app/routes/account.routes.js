@@ -10,15 +10,7 @@ module.exports = function(app) {
     next();
   });
   
-  app.get(
-    "/api/accounts",
-    [verifyToken],
-    controller.findAll
-  );
+  app.get("/api/accounts", [verifyToken], controller.findAll);
 
-  app.put(
-    "/api/accounts",
-    [verifyToken],
-    controller.update
-  );
+  app.put("/api/accounts", [verifyToken], controller.update);
 };

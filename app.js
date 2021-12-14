@@ -33,7 +33,7 @@ const db = require("./app/models");
 
 if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   
-  if(false && process.env.NODE_ENV !== "production" )
+  if(process.env.NODE_ENV !== "production" )
   {
     db.sequelize.sync({force: true}).then(() => {
       console.log('Drop and Resync Db');

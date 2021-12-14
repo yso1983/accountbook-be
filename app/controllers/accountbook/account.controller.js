@@ -17,7 +17,8 @@ function fn_findAllCondition(req){
         }
       ],
       where: {
-        user_id: req.query.userid
+        user_id: req.query.userid,
+        group_id: req.groupId
       }
      };
   }else{
@@ -29,8 +30,11 @@ function fn_findAllCondition(req){
           attributes: ['name'],
           //where: ["year_birth = post_year"]
         }
-      ]
-     };
+      ],
+      where: {
+        group_id: req.groupId
+      }
+    };
   }
 }
 
@@ -60,7 +64,7 @@ exports.update = (req, res) => {
   }
   else{
 
-    let params = { user_id: data.user_id, name: data.name, amount: commFunc.parseFloat(data.amount), remark: data.remark };
+    let params = { user_id: req.userId, name: data.name, amount: commFunc.parseFloat(data.amount), remark: data.remark, group_id: req.groupId };
 
     if(data.id == '0'){
       Account.create(params)
@@ -75,7 +79,7 @@ exports.update = (req, res) => {
       });
     }
     else{
-      Account.update(params, {where: { id: data.id }})
+      Account.update(params, {where: { id: req.userId }})
       .then(account => {
         if (!account) {
           return res.status(404).send({ message: "Account Not found." });
@@ -86,7 +90,6 @@ exports.update = (req, res) => {
         res.status(500).send(err.message);
       });
     }
-
   }
 
 };

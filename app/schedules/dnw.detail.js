@@ -41,7 +41,7 @@ exports.start = async () => {
                 created_user_id: automatic.created_user_id, 
                 amount: automatic.amount, 
                 standard_dt:  date.format('YYYY-MM-DD'), 
-                remark: 'schedule' 
+                remark: '매월 자동 입출금' 
               };
 
               setDnwDetail(params, automatic.id);

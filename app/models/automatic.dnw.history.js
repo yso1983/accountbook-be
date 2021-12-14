@@ -2,6 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   return sequelize.define("automatic_dnws_exec_log", {
     automatic_id : {
       type: Sequelize.INTEGER,
+      allowNull: false,
       references: { model: 'automatic_dnws', key: 'id' },
     },
     seccess_yn : {

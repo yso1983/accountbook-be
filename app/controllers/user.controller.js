@@ -19,16 +19,24 @@ exports.moderatorBoard = (req, res) => {
 };
 
 exports.getUsers = (req, res) => {
-  User.findAll({
-    attributes: ['id', 'name', 'email']
-  })
-  .then(users => {
-    if (!users) {
-      return res.status(404).send({ message: "User Not found." });
-    }
-    res.status(200).send(success(users));
+  db.group.findByPk(req.groupId)
+  .then(group =>{
+
+    group.getUsers({
+      attributes: ['id', 'name', 'email']
+    })
+    .then(users => {
+      if (!users) {
+        return res.status(200).send(failure("1001", "User Not found."));
+      }
+      res.status(200).send(success(users));
+    })
+    .catch(err => {
+      res.status(500).send(failure("9101", err.message));
+    });
+
   })
   .catch(err => {
-    res.status(500).send(err.message);
+    res.status(500).send(failure("9102", err.message));
   });
 };

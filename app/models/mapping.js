@@ -27,4 +27,22 @@ module.exports = function(db) {
   
   db.automaticDnw.hasMany(db.autoDnwExecLog, {foreignKey: 'automatic_id'});
   db.autoDnwExecLog.belongsTo(db.automaticDnw, {foreignKey: 'automatic_id'});
+  
+  db.group.hasMany(db.account, {foreignKey: 'group_id'});
+  db.account.belongsTo(db.group, {foreignKey: 'group_id'});
+
+  db.group.hasMany(db.dnwItem, {foreignKey: 'group_id'});
+  db.dnwItem.belongsTo(db.group, {foreignKey: 'group_id'});
+
+  db.user.belongsToMany(db.group, {
+    through: "users_groups",
+    foreignKey: "groupId",
+    otherKey: "userId"
+  });
+  db.group.belongsToMany(db.user, {
+    through: "users_groups",
+    foreignKey: "userId",
+    otherKey: "groupId"
+  });
+
 };

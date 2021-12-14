@@ -12,7 +12,7 @@ exports.create = (req, res) => {
   let params = { 
     account_id: req.body.account_id, 
     dnw_item_id: req.body.dnw_item_id, 
-    created_user_id: req.body.user_id, 
+    created_user_id: req.userId, 
     amount: commFunc.parseFloat(req.body.amount), 
     day: commFunc.parseFloat(req.body.day)
   };
@@ -30,6 +30,7 @@ exports.findAll = (req, res) => {
      include: [
         {
           model: db.account,
+          where: { group_id: req.groupId },
           required: true,
           attributes: ['name'],
           include: [

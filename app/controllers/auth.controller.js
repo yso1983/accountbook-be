@@ -56,7 +56,7 @@ exports.signin = (req, res) => {
     if (!user) {
       return res.status(404).send(failure("1002", "User Not found." ));
     }
-
+    
     let passwordIsValid = bcrypt.compareSync(
       req.body.password,
       user.password
@@ -66,30 +66,44 @@ exports.signin = (req, res) => {
       return res.status(401).send(failure("1008", "Invalid Password!"));
     }
 
-    const token = sign(user);
-    const refreshToken = refresh();
+    //그룹 체크하자.
+    let groups = [];
     
-    //토큰있으면 업데이트 한다. Insert Or Update
-    upsert(db.token, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
-    .then(function(result){
+    user.getGroups()
+    .then(data => {
+
+      for (let i = 0; i < data.length; i++) {
+        groups.push({id: data[i].id, name: data[i].name});
+      }
+
+      const token = sign(user, groups);
+      const refreshToken = refresh();
       
-      let authorities = [];
-      user.getRoles().then(roles => {
-        for (let i = 0; i < roles.length; i++) {
-          authorities.push("ROLE_" + roles[i].name.toUpperCase());
-        }
-        res.status(200).send({
-          id: user.id,
-          //username: user.username,
-          name: user.name,
-          email: user.email,
-          roles: authorities,
-          accessToken: token,
-          refreshToken: refreshToken
+      //토큰있으면 업데이트 한다. Insert Or Update
+      upsert(db.token, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
+        .then(function(result){
+
+          let authorities = [];
+          
+          user.getRoles().then(roles => {
+            for (let i = 0; i < roles.length; i++) {
+              authorities.push("ROLE_" + roles[i].name.toUpperCase());
+            }
+            res.status(200).send({
+              id: user.id,
+              //username: user.username,
+              name: user.name,
+              email: user.email,
+              roles: authorities,
+              groups: groups,
+              accessToken: token,
+              refreshToken: refreshToken,
+            });
         });
-      });
-    })
-    .catch(err => res.status(401).send(failure("8001", err.message)));
+      })
+      .catch(err => res.status(401).send(failure("8001", err.message)));
+
+    });
   })
   .catch(err => {
     res.status(500).send(failure("9999", err.message));
@@ -125,7 +139,7 @@ exports.refresh = (req, res) => {
       } else {
         
         // 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급
-        const newAccessToken = sign({id : decoded.id, email: decoded.email});
+        const newAccessToken = sign({id : decoded.id, email: decoded.email}, decoded.groups);
 
         // 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
         res.status(200).send(success(

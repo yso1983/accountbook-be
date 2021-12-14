@@ -14,3 +14,7 @@ https://velog.io/@kshired/Express%EC%97%90%EC%84%9C-JWT%EB%A1%9C-%EC%9D%B8%EC%A6
 [sequelize]
 https://sequelize.org/master/class/lib/data-types.js~ENUM.html
 https://sequelize.org/master/manual/legacy.html
+
+https://runebook.dev/ko/docs/sequelize/manual/advanced-many-to-many
+
+https://jeonghwan-kim.github.io/sequalize-%EC%BF%BC%EB%A6%AC/

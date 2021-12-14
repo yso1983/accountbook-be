@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  return sequelize.define("dnw_items", {
+  return sequelize.define("groups", {
     name : {
       type: Sequelize.STRING(50),
       allowNull: false,
@@ -7,10 +7,9 @@ module.exports = (sequelize, Sequelize) => {
     remark: {
       type: Sequelize.STRING(200),
     },
-    group_id: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: { model: 'groups', key: 'id' }
-    }
+    use_yn: {
+      type: Sequelize.ENUM('N', 'Y'),
+      defaultValue: 'Y'
+    },
   });
 };

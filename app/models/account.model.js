@@ -1,7 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
-  const Account = sequelize.define("accounts", {
+  return sequelize.define("accounts", {
     user_id : {
       type: Sequelize.INTEGER,
+      allowNull: false,
       references: { model: 'users', key: 'id' }
     },
     name : {
@@ -15,7 +16,10 @@ module.exports = (sequelize, Sequelize) => {
     remark: {
       type: Sequelize.STRING(200),
     },
+    group_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: { model: 'groups', key: 'id' }
+    }
   });
-
-  return Account;
 };

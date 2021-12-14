@@ -14,7 +14,7 @@ const sequelize = db.sequelize;
 // Create and Save a new Tutorial
 exports.createItem = (req, res) => {
 
-  upsert(DnwItem, { name: req.body.name, remark: req.body.remark  }, { id: req.body.id })
+  upsert(DnwItem, { name: req.body.name, remark: req.body.remark, group_id: req.groupId  }, { id: req.body.id })
     .then(result => {
        res.status(200).send(success(result));
     })
@@ -35,6 +35,7 @@ exports.findAllItem = (req, res) => {
       duplicating: false,
       required: false
     }],
+    where: { group_id: req.groupId },
     group: ['dnw_items.id'],
     order: [[sequelize.literal('count'), 'DESC'], ['id', 'DESC']]
   })
@@ -51,28 +52,29 @@ exports.findAllItem = (req, res) => {
 
 exports.findAllDetails = (req, res) => {
   DnwDetail.findAll({
-     include: [
-        {
-          model: db.account,
-          required: true,
-          attributes: ['name'],
-          include: [
-            {
-              model: db.user,
-              required: true,
-              attributes: ['name'],
-            },
-          ]
-        },
-        {
-          model: DnwItem,
-          required: true,
-          attributes: ['name'],
-        },
-     ],
-      order: [
-        ['id', 'DESC']
-      ],
+    include: [
+      {
+        model: Account,
+        where: { group_id: req.groupId },
+        required: true,
+        attributes: ['name'],
+        include: [
+          {
+            model: db.user,
+            required: true,
+            attributes: ['name'],
+          },
+        ]
+      },
+      {
+        model: DnwItem,
+        required: true,
+        attributes: ['name'],
+      },
+    ],
+    order: [
+      ['id', 'DESC']
+    ],
   })
   .then(details => {
     if (!details) {
@@ -89,7 +91,7 @@ exports.createDetail = (req, res) => {
   let params = { 
     account_id: req.body.account_id, 
     dnw_item_id: req.body.dnw_item_id, 
-    created_user_id: req.body.user_id, 
+    created_user_id: req.userId,
     amount: commFunc.parseFloat(req.body.amount), 
     standard_dt: req.body.standard_dt, 
     remark: req.body.remark,
@@ -101,18 +103,19 @@ exports.createDetail = (req, res) => {
       return res.status(401).send(failure("9991", "입금하는 계좌랑 출금하는 계좌가 동일합니다."));
     }
 
-    createDetailFromAndTo(params, to_account_id, res) ;
+    createDetailFromAndTo(params, to_account_id, req, res) ;
   }
   else{
-    createOnlyDetail(params, res);
+    createOnlyDetail(params, req, res);
   }
 
 };
 
-function createOnlyDetail(params, res) {
+function createOnlyDetail(params, req, res) {
   Account.findOne({
     where: {
-      id: params.account_id
+      id: params.account_id,
+      group_id: req.groupId
     }
   })
   .then(account => {
@@ -155,11 +158,12 @@ function createOnlyDetail(params, res) {
 }
 
 
-function createDetailFromAndTo(params, to_account_id, res) {
+function createDetailFromAndTo(params, to_account_id, req, res) {
 
   Account.findOne({
     where: {
-      id: params.account_id
+      id: params.account_id,
+      group_id: req.groupId
     }
   })
   .then(account => {
@@ -174,7 +178,8 @@ function createDetailFromAndTo(params, to_account_id, res) {
 
     Account.findOne({
       where: {
-        id: to_account_id
+        id: to_account_id,
+        group_id: req.groupId
       }
     })
     .then(toAccount => {
@@ -243,7 +248,8 @@ exports.findDetailsByMonth = (req, res) => {
   DnwDetail.findAll({
      include: [
         {
-          model: db.account,
+          model: Account,
+          where: {group_id: req.groupId},
           required: true,
           attributes: ['name'],
           include: [
@@ -281,19 +287,27 @@ exports.findDetailsByMonth = (req, res) => {
 };
 
 exports.getDnwChartLastFewDays = (req, res) => {
-  const day = commFunc.parseFloat(req.params.day ?? 7);
+  const day = commFunc.parseFloat(req.params.lastday ?? 7);
   let startDt = moment(commFunc.addDays(new Date(), (0 - day))).tz('Asia/Seoul').format();
   let endDt = moment(new Date()).tz('Asia/Seoul').format();
 
   DnwDetail.findAll({
     attributes: [
       [sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d'), 'day'], 
-      [sequelize.literal(`SUM(CASE WHEN amount >= 0  THEN amount ELSE 0 END)`), 'plus'],
-      [sequelize.literal(`SUM(CASE WHEN amount < 0  THEN amount ELSE 0 END)`), 'minus'],
+      [sequelize.literal(`SUM(CASE WHEN dnw_details.amount >= 0  THEN dnw_details.amount ELSE 0 END)`), 'plus'],
+      [sequelize.literal(`SUM(CASE WHEN dnw_details.amount < 0  THEN dnw_details.amount ELSE 0 END)`), 'minus'],
       //[sequelize.fn('sum', sequelize.col('amount')), 'total']
     ],
     group :[sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d')],
     raw: true,
+    include: [
+      {
+        model: Account,
+        where: {group_id: req.groupId},
+        required: true,
+        attributes: ['name']
+      }
+    ],
     where: {
       // amount: {
       //   [Op.lt]: 0
@@ -306,9 +320,8 @@ exports.getDnwChartLastFewDays = (req, res) => {
   })
   .then(details => {
 
-
     if (!details) {
-      return res.status(404).send({ message: "Not found." });
+      return res.status(404).send(failure("4101", "Not found."));
     }
     res.status(200).send(success(details));
   })

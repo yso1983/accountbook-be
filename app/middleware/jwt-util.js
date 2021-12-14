@@ -6,13 +6,15 @@ const db = require("@db");
 const Tokens = db.token;
 
 module.exports = {
-  sign: (user) => { // access token 발급
+  sign: (user, groups) => { // access token 발급
     const payload = {
-      idx: user.id,
+      id: user.id,
       email: user.email,
+      groups: groups
     };
     return jwt.sign(payload, secretKey, options);
   },
+
   verify: (token) => { // access token 검증
     let decoded = null;
     try {
@@ -21,6 +23,7 @@ module.exports = {
         code: "0000",
         id: decoded.id,
         email: decoded.email,
+        groups: decode.groups
       };
     } catch (err) {
       return {
@@ -29,12 +32,14 @@ module.exports = {
       };
     }
   },
+
   refresh: () => { 
     return jwt.sign({}, secretKey, { // refresh token은 payload 없이 발급
       algorithm: options.algorithm,
       expiresIn: '14d',
     });
   },
+  
   refreshVerify: async (token, userId) => { // refresh token 검증
     try {
       Tokens.findOne({

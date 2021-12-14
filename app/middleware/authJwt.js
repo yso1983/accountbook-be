@@ -7,6 +7,7 @@ const { success, failure } = require("./responseJson");
 verifyToken = (req, res, next) => {
   //const authToken = req.headers["x-access-token"];
   const authToken = req.headers.authorization.split('Bearer ')[1];
+  const groupId = req.headers.groupid;
 
   if (!authToken) {
     return res.status(403).send(failure("3101", "No token provided!"));
@@ -23,8 +24,18 @@ verifyToken = (req, res, next) => {
             return res.status(200).send(failure("3103", "invalid token"));
         }
       }
-      req.userId = decoded.id;
-      next();
+      
+      let group = decoded.groups.filter(x => x.id == groupId);
+
+      if(group && group.length > 0){
+        req.groupId = group[0].id;
+        req.userId = decoded.id;
+        next();
+      }
+      else{
+        return res.status(200).send(failure("3104", "소속된 그룹 없음"));
+      }
+
     });
     
   } catch (err) {
