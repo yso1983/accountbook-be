@@ -291,12 +291,15 @@ exports.getDnwChartLastFewDays = (req, res) => {
   let startDt = moment(commFunc.addDays(new Date(), (0 - day))).tz('Asia/Seoul').format();
   let endDt = moment(new Date()).tz('Asia/Seoul').format();
 
+  let limit = req.query.limit;
+
   DnwDetail.findAll({
     attributes: [
       [sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d'), 'day'], 
       [sequelize.literal(`SUM(CASE WHEN dnw_details.amount >= 0  THEN dnw_details.amount ELSE 0 END)`), 'plus'],
       [sequelize.literal(`SUM(CASE WHEN dnw_details.amount < 0  THEN dnw_details.amount ELSE 0 END)`), 'minus'],
       //[sequelize.fn('sum', sequelize.col('amount')), 'total']
+      "dnw_details.remark",
     ],
     group :[sequelize.fn('date_format', sequelize.col('standard_dt'),'%Y-%m-%d')],
     raw: true,
@@ -316,6 +319,9 @@ exports.getDnwChartLastFewDays = (req, res) => {
         [Op.between]: [startDt, endDt], 
       }
     },
+    offset: 0, //((page-1)*limit),
+    limit : commFunc.parseFloat(limit ?? 5),
+    subQuery:false,
     order: sequelize.literal('day DESC')
   })
   .then(details => {

@@ -8,4 +8,5 @@ module.exports = function(app) {
   require('./account.routes')(app);
   require('./dnw.routes')(app);
   require('./automatic.dnw.routes')(app);
+  require('./home.routes')(app);
 };

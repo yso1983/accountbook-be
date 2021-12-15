@@ -33,7 +33,7 @@ const db = require("./app/models");
 
 if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
   
-  if(process.env.NODE_ENV !== "production" )
+  if(false && process.env.NODE_ENV !== "production" )
   {
     db.sequelize.sync({force: true}).then(() => {
       console.log('Drop and Resync Db');
@@ -44,8 +44,12 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
     db.sequelize.sync();
   };
 
+  let scheduleTime = '00 30 * * * *';
+
+  if(process.env.NODE_ENV !== "production") scheduleTime = '30 * * * * *';
+
 	// schedule your job here.
-  const job = schedule.scheduleJob('00 30 * * * *', function(){
+  const job = schedule.scheduleJob(scheduleTime, function(){
      require("./app/schedules/dnw.detail").start();
   });
 }
