@@ -80,6 +80,7 @@ exports.findAllDetails = (req, res) => {
     ],
     offset: ((page-1) * limit),
     limit : limit,
+    subQuery:false,
   })
   .then(details => {
     if (!details) {
@@ -352,7 +353,7 @@ exports.findDnwTotalAmountbyMonthAndAccountId = (req, res) => {
   }
   else {
     year = new Date().getFullYear();
-    month = new Date().getMonth();
+    month = new Date().getMonth() + 1;
   }
   
   let startDt = moment(new Date(year, (month - 1), 1, 0, 0, 0)).tz('Asia/Seoul').format();
