@@ -51,6 +51,9 @@ exports.findAllItem = (req, res) => {
 };
 
 exports.findAllDetails = (req, res) => {
+  const limit = commFunc.parseFloat(req.query.limit ?? 5);
+  const page = commFunc.parseFloat(req.query.page ?? 1);
+
   DnwDetail.findAll({
     include: [
       {
@@ -75,6 +78,8 @@ exports.findAllDetails = (req, res) => {
     order: [
       ['id', 'DESC']
     ],
+    offset: ((page-1) * limit),
+    limit : limit,
   })
   .then(details => {
     if (!details) {
@@ -240,7 +245,7 @@ function createDetailFromAndTo(params, to_account_id, req, res) {
 exports.findDetailsByMonth = (req, res) => {
   let startDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), (parseInt(req.params.month.replace('-', '').substring(4)) - 1), 1, 0, 0, 0))
     .tz('Asia/Seoul').format();
-  let endDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), (req.params.month.replace('-', '').substring(4)), 1, 0, 0, 0))
+  let endDt = moment(new Date(req.params.month.replace('-', '').substring(0, 4), req.params.month.replace('-', '').substring(4), 1, 0, 0, 0))
     .tz('Asia/Seoul').format();
 
   //logger.info(req.params.month, startDt, endDt);
@@ -287,7 +292,7 @@ exports.findDetailsByMonth = (req, res) => {
 };
 
 exports.getDnwChartLastFewDays = (req, res) => {
-  const day = commFunc.parseFloat(req.params.lastday ?? 7);
+  const day = commFunc.parseFloat(req.params.lastday ?? 30);
   let startDt = moment(commFunc.addDays(new Date(), (0 - day))).tz('Asia/Seoul').format();
   let endDt = moment(new Date()).tz('Asia/Seoul').format();
 
@@ -319,8 +324,8 @@ exports.getDnwChartLastFewDays = (req, res) => {
         [Op.between]: [startDt, endDt], 
       }
     },
-    offset: 0, //((page-1)*limit),
-    limit : commFunc.parseFloat(limit ?? 5),
+    //offset: 0, //((page-1)*limit),
+    //limit : commFunc.parseFloat(limit ?? 5),
     subQuery:false,
     order: sequelize.literal('day DESC')
   })
@@ -335,4 +340,44 @@ exports.getDnwChartLastFewDays = (req, res) => {
     res.status(500).send(err.message);
   });
 
+};
+
+exports.findDnwTotalAmountbyMonthAndAccountId = (req, res) => {
+  let year;
+  let { month } = req.params;
+
+  if(month !== "last" && month && month >= 6){
+    year = month.replace('-', '').substring(0, 4);
+    month = parseInt(month.replace('-', '').substring(4));
+  }
+  else {
+    year = new Date().getFullYear();
+    month = new Date().getMonth();
+  }
+  
+  let startDt = moment(new Date(year, (month - 1), 1, 0, 0, 0)).tz('Asia/Seoul').format();
+  let endDt = moment(new Date(year, month, 1, 0, 0, 0)).tz('Asia/Seoul').format();
+  
+
+  DnwDetail.findOne({
+    where: {
+      account_id: req.query.accountId,
+      standard_dt: {
+        [Op.between]: [startDt, endDt], 
+      }
+    },
+    attributes: [
+      [sequelize.fn('sum', sequelize.col('amount')), 'total'], 
+    ],
+    subQuery:false,
+  })
+  .then(result => {
+    if (!result) {
+      return res.status(404).send({ message: "Not found." });
+    }
+    res.status(200).send(success(result));
+  })
+  .catch(err => {
+    res.status(500).send(err.message);
+  });
 };

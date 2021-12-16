@@ -5,14 +5,15 @@ const User = db.user;
 const { success, failure } = require("./responseJson");
 
 verifyToken = (req, res, next) => {
-  //const authToken = req.headers["x-access-token"];
-  const authToken = req.headers.authorization.split('Bearer ')[1];
-  const groupId = req.headers.groupid;
-
-  if (!authToken) {
-    return res.status(403).send(failure("3101", "No token provided!"));
-  }
+  
   try {
+    //const authToken = req.headers["x-access-token"];
+    const authToken = req.headers.authorization.split('Bearer ')[1];
+    const groupId = req.headers.groupid;
+
+    if (!authToken) {
+      return res.status(403).send(failure("3101", "No token provided!"));
+    }
 
     jwt.verify(authToken, secretKey, (err, decoded) => {
       if (err) {

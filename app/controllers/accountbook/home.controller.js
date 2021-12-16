@@ -31,8 +31,7 @@ exports.getDnwThisMonth = (req, res) => {
       {
         model: Account,
         where: {group_id: req.groupId},
-        required: true,
-        attributes: ['name']
+        required: true
       }
     ],
     where: {

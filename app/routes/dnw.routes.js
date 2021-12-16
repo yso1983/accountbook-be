@@ -19,4 +19,7 @@ module.exports = function(app) {
   app.get( "/api/dnw/:month/details", [verifyToken], controller.findDetailsByMonth);
   app.get( "/api/dnw/:lastday/chart", [verifyToken], controller.getDnwChartLastFewDays);
 
+  app.get( "/api/dnw/:month/amount", [verifyToken], controller.findDnwTotalAmountbyMonthAndAccountId);
+
+
 };
