@@ -79,7 +79,7 @@ exports.update = (req, res) => {
       });
     }
     else{
-      Account.update(params, {where: { id: req.userId }})
+      Account.update(params, {where: { id: data.id }})
       .then(account => {
         if (!account) {
           return res.status(404).send({ message: "Account Not found." });
