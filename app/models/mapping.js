@@ -34,6 +34,9 @@ module.exports = function(db) {
   db.group.hasMany(db.dnwItem, {foreignKey: 'group_id'});
   db.dnwItem.belongsTo(db.group, {foreignKey: 'group_id'});
 
+  db.user.hasMany(db.ssoUser, {foreignKey: 'user_id'});
+  db.ssoUser.belongsTo(db.user, {foreignKey: 'user_id'});
+
   db.user.belongsToMany(db.group, {
     through: "users_groups",
     foreignKey: "groupId",

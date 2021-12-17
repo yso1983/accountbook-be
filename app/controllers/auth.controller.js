@@ -47,6 +47,11 @@ exports.signup = (req, res) => {
 };
 
 exports.signin = (req, res) => {
+  if(req.body.login_type && req.body.login_type.length > 0){
+    SSOLogin(req, res);
+    return;
+  }
+
   User.findOne({
     where: {
       email: req.body.email
@@ -159,4 +164,71 @@ exports.refresh = (req, res) => {
 
 exports.check = (req, res) => {
   res.status(200).send(success("token is valid!"));
+}
+
+function SSOLogin (req, res){
+  db.ssoUser.findOne({
+    where: {
+      email: req.body.email,
+      sso_type: req.body.login_type,
+      use_yn: 'Y'
+    },
+    include: [
+      {
+        model: User,
+        required: true,
+      }
+    ]
+  })
+  .then(ssoUser => {
+
+    //console.log(ssoUser);
+    if (!ssoUser || !ssoUser.user) {
+      return res.status(404).send(failure("1002", "User Not found." ));
+    }
+    
+    let user = ssoUser.user;
+
+    //그룹 체크하자.
+    let groups = [];
+    
+    user.getGroups()
+    .then(data => {
+
+      for (let i = 0; i < data.length; i++) {
+        groups.push({id: data[i].id, name: data[i].name});
+      }
+
+      const token = sign(user, groups);
+      const refreshToken = refresh();
+      
+      //토큰있으면 업데이트 한다. Insert Or Update
+      upsert(db.token, { refreshToken: refreshToken, user_id: user.id }, { user_id: user.id })
+        .then(function(result){
+
+          let authorities = [];
+          
+          user.getRoles().then(roles => {
+            for (let i = 0; i < roles.length; i++) {
+              authorities.push("ROLE_" + roles[i].name.toUpperCase());
+            }
+            res.status(200).send({
+              id: user.id,
+              //username: user.username,
+              name: user.name,
+              email: user.email,
+              roles: authorities,
+              groups: groups,
+              accessToken: token,
+              refreshToken: refreshToken,
+            });
+        });
+      })
+      .catch(err => res.status(401).send(failure("8001", err.message)));
+
+    });
+  })
+  .catch(err => {
+    res.status(500).send(failure("9999", err.message));
+  });
 }
