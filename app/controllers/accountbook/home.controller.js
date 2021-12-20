@@ -40,7 +40,10 @@ exports.getDnwThisMonth = (req, res) => {
       },
       standard_dt: {
         [Op.between]: [startDt, endDt], 
-      }
+      },
+      to_account_id: {
+          [Op.is]: null, // Like: from_detail_id IS NULL
+      },
     },
     subQuery:false,
     order: sequelize.literal('yearMonth DESC')

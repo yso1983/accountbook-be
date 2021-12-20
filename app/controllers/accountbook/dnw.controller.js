@@ -200,12 +200,9 @@ function createDetailFromAndTo(params, to_account_id, req, res) {
 
       db.sequelize.transaction()
       .then(t => { 
-        logger.info(accountParams);
-        
         return account.update(accountParams, { transaction: t })
           .then(result => { 
-            logger.info(params);
-
+            params.to_account_id = to_account_id;
             return DnwDetail.create(params, {transaction: t}); 
           })
           .then(result => {
@@ -213,7 +210,9 @@ function createDetailFromAndTo(params, to_account_id, req, res) {
             return toAccount.update(toAccountParams, { transaction: t });
           })
           .then(result => { 
+            
             params.account_id = to_account_id;
+            params.to_account_id = null;
             params.amount = 0 - params.amount;
 
             return DnwDetail.create(params, {transaction: t}); 
@@ -366,9 +365,6 @@ exports.findDnwTotalAmountbyMonthAndAccountId = (req, res) => {
       account_id: req.query.accountId,
       standard_dt: {
         [Op.between]: [startDt, endDt], 
-      },
-      from_detail_id: {
-          [Op.is]: null, // Like: from_detail_id IS NULL
       },
     },
     attributes: [

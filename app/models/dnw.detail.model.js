@@ -29,5 +29,8 @@ module.exports = (sequelize, Sequelize) => {
     from_detail_id : {
       type: Sequelize.INTEGER
     },
+    to_account_id : {
+      type: Sequelize.INTEGER
+    },
   });
 };
