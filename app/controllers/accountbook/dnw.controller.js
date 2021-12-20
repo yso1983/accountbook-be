@@ -366,7 +366,10 @@ exports.findDnwTotalAmountbyMonthAndAccountId = (req, res) => {
       account_id: req.query.accountId,
       standard_dt: {
         [Op.between]: [startDt, endDt], 
-      }
+      },
+      from_detail_id: {
+          [Op.is]: null, // Like: from_detail_id IS NULL
+      },
     },
     attributes: [
       [sequelize.fn('sum', sequelize.col('amount')), 'total'], 
