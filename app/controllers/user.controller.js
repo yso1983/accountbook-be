@@ -1,6 +1,6 @@
 const db = require("@db");
 const User = db.user;
-const { success, failure } = require('@middleware').responseJson;
+const { success, failure } = require('@utils').responseJson;
 
 exports.allAccess = (req, res) => {
   res.status(200).send("Public Content.");

@@ -16,7 +16,8 @@
     "@app": "./app",
     "@controllers": "./app/controllers",
     "@db": "./app/models",
-    "@middleware": "./app/middleware"
+    "@middleware": "./app/middleware",
+    "@utils": "./app/utils"
   },
   "dependencies": {
     "axios": "^0.24.0",

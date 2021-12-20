@@ -1,9 +1,9 @@
 const db = require("@db");
 const logger = require('@winston');
-const { success, failure } = require('@middleware').responseJson;
-const { upsert } = require('@middleware').sequelizeUtil;
+const { success, failure } = require('@utils').responseJson;
+const { upsert } = require('@utils').sequelizeUtil;
 const moment = require('moment-timezone');
-const commFunc =  require('@middleware').commFunc;
+const commFunc =  require('@utils').commFunc;
 
 const DnwDetail = db.dnwDetail;
 const DnwItem = db.dnwItem;

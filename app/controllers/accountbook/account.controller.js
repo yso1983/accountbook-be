@@ -2,8 +2,8 @@ const db = require("@db");
 const Account = db.account;
 const User = db.user;
 const logger = require('@winston');
-const { success, failure } = require('@middleware').responseJson;
-const commFunc =  require('@middleware').commFunc;
+const { success, failure } = require('@utils').responseJson;
+const commFunc =  require('@utils').commFunc;
 
 function fn_findAllCondition(req){
   if(req.query.userid){

@@ -26,5 +26,8 @@ module.exports = (sequelize, Sequelize) => {
     remark: {
       type: Sequelize.STRING(200),
     },
+    from_detail_id : {
+      type: Sequelize.INTEGER
+    },
   });
 };

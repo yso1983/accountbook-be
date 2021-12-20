@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const secretKey = require('@app/config/auth.config').secretKey;
 const db = require("@db");
 const User = db.user;
-const { success, failure } = require("./responseJson");
+const { success, failure } = require("../utils/responseJson");
 
 verifyToken = (req, res, next) => {
   

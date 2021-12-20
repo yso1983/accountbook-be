@@ -4,9 +4,9 @@ const bcrypt = require("bcryptjs");
 const secretKey = require('@app/config/auth.config').secretKey;
 const options = require('@app/config/auth.config').options;
 const { sign, verify, refresh, refreshVerify } = require('@middleware').jwtUtil;
-const { upsert } = require('@middleware').sequelizeUtil;
+const { upsert } = require('@utils').sequelizeUtil;
 const logger = require('@winston');
-const { success, failure } = require('@middleware').responseJson;
+const { success, failure } = require('@utils').responseJson;
 
 const User = db.user;
 const Role = db.role;
