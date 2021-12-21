@@ -70,9 +70,9 @@ require('./app/routes')(app);
 
 // morgan 로그 설정 
 const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 
-//const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : combined; // NOTE: morgan 출력 형태 server.env에서 NODE_ENV 설정 production : 배포 dev : 개발
+const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : combined; // NOTE: morgan 출력 형태 server.env에서 NODE_ENV 설정 production : 배포 dev : 개발
 
-app.use(morgan('dev', {stream : logger.stream}));
+app.use(morgan(morganFormat, {stream : logger.stream}));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
