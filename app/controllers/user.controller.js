@@ -40,3 +40,68 @@ exports.getUsers = (req, res) => {
     res.status(500).send(failure("9102", err.message));
   });
 };
+
+exports.getGroups = (req, res) => {
+  db.group.findAll()
+  .then(groups =>{
+    if (!groups) {
+      return res.status(200).send(failure("1001", "User Not found."));
+    }
+    res.status(200).send(success(groups));
+  })
+  .catch(err => {
+    res.status(500).send(failure("9102", err.message));
+  });
+};
+
+exports.getUsersByGroupId = (req, res) => {
+  db.user.findAll(fn_findAllCondition(req))
+  .then(users =>{
+
+    if (!users) {
+      return res.status(200).send(failure("1001", "User Not found."));
+    }
+    res.status(200).send(success(users));
+
+  })
+  .catch(err => {
+    res.status(500).send(failure("9102", err.message));
+  });
+};
+
+function fn_findAllCondition(req){
+  if(req.query.groupId){
+    return {
+     include: [
+        {
+          model: db.ssoUser,
+          attributes: ['id', 'email', 'nick_name', 'sso_type', 'use_yn'],
+        },
+        {
+          model: db.group,
+          require: true,
+          attributes: ['id', 'name'],
+          where: {
+            id: req.query.groupId
+          }
+        }
+      ],
+      attributes: ['id', 'name', 'username', 'email', 'account_locked']
+     };
+  }else{
+    return {
+     include: [
+        {
+          model: db.ssoUser,
+          attributes: ['id', 'email', 'nick_name', 'sso_type', 'use_yn'],
+        },
+        {
+          model: db.group,
+          require: true,
+          attributes: ['id', 'name']
+        }
+      ],
+      attributes: ['id', 'name', 'username', 'email', 'account_locked'],
+    };
+  }
+}

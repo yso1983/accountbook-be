@@ -15,31 +15,47 @@ const Op = db.Sequelize.Op;
 
 exports.signup = (req, res) => {
   // Save User to Database
-  User.create({
+  if (!req.body.groups || req.body.groups.length < 1){
+    return res.status(500).send(failure("9900", 'not found groups'));
+  }
+
+  let params = {
     name: req.body.name,
-    username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8)
-  })
+    account_locked: req.body.account_locked, 
+    id: req.body.id ?? 0, 
+  }
+
+  if(!req.body.id || parseInt(req.body.id) == 0){
+    params.username = req.body.username;
+    params.email = req.body.email;
+    params.password = bcrypt.hashSync('123456', 8);
+  }
+
+  upsert(User, params, { id: req.body.id ?? 0})
     .then(user => {
-      if (req.body.roles) {
-        Role.findAll({
-          where: {
-            name: {
-              [Op.or]: req.body.roles
+      user.setGroups(req.body.groups)
+      .then(() => {
+        if (req.body.roles) {
+
+          Role.findAll({
+            where: {
+              name: {
+                [Op.or]: req.body.roles
+              }
             }
-          }
-        }).then(roles => {
-          user.setRoles(roles).then(() => {
+          }).then(roles => {
+            user.setRoles(roles).then(() => {
+              res.send( success({ message: "User was registered successfully!" }));
+            });
+          });
+
+        } else {
+          // user role = 1
+          user.setRoles([1]).then(() => {
             res.send( success({ message: "User was registered successfully!" }));
           });
-        });
-      } else {
-        // user role = 1
-        user.setRoles([1]).then(() => {
-          res.send(success({ message: "User was registered successfully!" }));
-        });
-      }
+        }
+      });
     })
     .catch(err => {
       res.status(500).send(failure("9999",err.message));
@@ -60,6 +76,10 @@ exports.signin = (req, res) => {
   .then(user => {
     if (!user) {
       return res.status(404).send(failure("1002", "User Not found." ));
+    }
+
+    if (user.account_locked == "Y") {
+      return res.status(404).send(failure("1003", "정지된 계정입니다." ));
     }
     
     let passwordIsValid = bcrypt.compareSync(

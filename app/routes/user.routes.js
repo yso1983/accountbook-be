@@ -35,4 +35,7 @@ module.exports = function(app) {
     [verifyToken],
     controller.getUsers
   );
+
+  app.get("/api/groups", [verifyToken, isAdmin], controller.getGroups);
+  app.get("/api/group/users", [verifyToken, isAdmin], controller.getUsersByGroupId);
 };
