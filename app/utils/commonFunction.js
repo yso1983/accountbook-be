@@ -5,3 +5,9 @@ exports.addDays = (date, days) => {
   result.setDate(result.getDate() + days);
   return result;
 };
+
+exports.sleep = (f, delay) =>{
+  return new Promise((res, rej) => {
+     setTimeout(() => res(f), delay)
+  });
+}

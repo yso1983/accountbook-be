@@ -4,11 +4,12 @@ const express = require('express');
 const logger = require('@winston')
 const router = express.Router();
 const axios = require('axios');
-const lottoCtrl = require('@controllers/lotto.controller.js');
+const controller = require('@controllers/lotto.controller.js');
 
 const lottoUrl = 'https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=';
 
 /**************************************************** function ***********************************************/
+/* 
 //중복 체크
 const getByData = (drwNo, res) => {
    db.query(query.selectById, [drwNo], (err, rows, fields) => {
@@ -106,77 +107,7 @@ const getRandom = (idx) => {
   }
   return printVal;
 }
-
-function sleep(f, delay){
-  return new Promise((res, rej) => {
-     setTimeout(() => res(f), delay)
-  });
-}
-
-async function execute(result){
-
-  for (let index = 0; index < 5; index++) {
-    await sleep(getRandom(1), 100).then(r => result.push(r));
-  }
-  return result;
-}
-
-const returnRandomData = (res, httpMethod) => {
-  let result = [];
-  
-  execute(result)
-  .then(r => {
-    if(httpMethod === 'get'){
-      res.render('lotto/random', { code: 1, result: r });
-    }
-    else{
-      res.json(r);
-    }
-  }).catch(r => {
-    if(httpMethod === 'get'){
-      res.render('lotto/random', { code: 0, result: '' });
-    }
-    else{
-      res.json(0);
-    }
-  });
-
-  /* 
-  //promise아닌 더 좋은 방법이 없을까...
-  new Promise((resolve, reject) => {
-    resolve(getRandom(1));
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    return getRandom(1);
-  }).then(r => {
-    result.push(r);
-    if(httpMethod === 'get'){
-      res.render('lotto/random', { code: 1, result: result });
-    }
-    else{
-      res.json(result);
-    }
-  }).catch(err => {
-    logger.error(err);
-    
-    if(httpMethod === 'get'){
-      res.render('lotto/random', { code: 0, result: result });
-    }
-    else{
-      res.json(0);
-    }
-  });
-   */
-}
+*/
 
 /******************************** Router *******************************************/
 /* GET items listing. */
@@ -220,17 +151,21 @@ router.get('/sync/:id', function(req, res, next) {
 
 //당첨 내역 리스트
 router.get('/', function(req, res, next) {
-  lottoCtrl.findAll(req, res);
+  controller.findAll(req, res);
 });
 
 //랜덤 추출
 router.get('/random', function(req, res, next){
-  returnRandomData(res, 'get');
+  let cnt = req.query.cnt ?? 5;
+  controller.getRandomData(cnt, res, 'get');
 });
 
 //랜덤 추출
 router.post('/random', function(req, res, next){
-  returnRandomData(res, 'post');
+  let cnt = req.body.cnt ?? 5;
+  controller.getRandomData(cnt, res, 'post');
 });
 
+
+router.get('/latest/sync', controller.syncLottoInfo);
 module.exports = router;
