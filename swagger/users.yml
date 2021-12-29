@@ -1,0 +1,31 @@
+# /swagger/users.yml
+
+components:
+  schemas:
+    User:
+      properties:
+        code: 
+          type: string
+          description: 응답 고유번호
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: 사용자 고유 번호
+              name:
+                type: string
+                description: 사용자명
+              email:
+                type: string
+                description: 사용자 명
+    Login:
+      properties:
+        email: 
+          type: string
+          description: 아이디
+        password: 
+          type: string
+          description: 비번

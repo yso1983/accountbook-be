@@ -8,6 +8,7 @@ const logger = require('./config/winston');
 const session = require('express-session');
 const cors = require("cors");
 const schedule = require('node-schedule');
+const { swaggerUi, specs } = require('./config/swagger');
 
 require('dotenv').config();
 
@@ -67,6 +68,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 require('./app/routes')(app);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // morgan 로그 설정 
 const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 
