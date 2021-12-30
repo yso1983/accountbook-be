@@ -39,13 +39,13 @@ module.exports = function(db) {
 
   db.user.belongsToMany(db.group, {
     through: "users_groups",
-    foreignKey: "groupId",
-    otherKey: "userId"
+    foreignKey: "userId",
+    otherKey: "groupId"
   });
   db.group.belongsToMany(db.user, {
     through: "users_groups",
-    foreignKey: "userId",
-    otherKey: "groupId"
+    foreignKey: "groupId",
+    otherKey: "userId"
   });
 
 };
