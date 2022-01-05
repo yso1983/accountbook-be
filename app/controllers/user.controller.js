@@ -84,6 +84,11 @@ function fn_findAllCondition(req){
           where: {
             id: req.query.groupId
           }
+        },
+        {
+          model: db.role,
+          require: true,
+          attributes: ['id', 'name']
         }
       ],
       attributes: ['id', 'name', 'username', 'email', 'account_locked']
@@ -97,6 +102,11 @@ function fn_findAllCondition(req){
         },
         {
           model: db.group,
+          require: true,
+          attributes: ['id', 'name']
+        },
+        {
+          model: db.role,
           require: true,
           attributes: ['id', 'name']
         }

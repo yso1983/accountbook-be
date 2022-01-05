@@ -19,6 +19,10 @@ exports.signup = (req, res) => {
     return res.status(500).send(failure("9900", 'not found groups'));
   }
 
+  if (!req.body.roles || req.body.roles.length < 1){
+    return res.status(500).send(failure("9900", 'not found roles'));
+  }
+
   let params = {
     name: req.body.name,
     account_locked: req.body.account_locked, 
@@ -36,18 +40,22 @@ exports.signup = (req, res) => {
       user.setGroups(req.body.groups)
       .then(() => {
         if (req.body.roles) {
-
-          Role.findAll({
-            where: {
-              name: {
-                [Op.or]: req.body.roles
-              }
-            }
-          }).then(roles => {
-            user.setRoles(roles).then(() => {
+          user.setRoles(req.body.roles).then(() => {
               res.send( success({ message: "User was registered successfully!" }));
             });
-          });
+          // Role.findAll({
+          //   where: {
+          //     name: {
+          //       [Op.or]: req.body.roles
+          //     }
+          //   }
+          // }).then(roles => {
+          //   console.log(roles);
+
+          //   user.setRoles(roles).then(() => {
+          //     res.send( success({ message: "User was registered successfully!" }));
+          //   });
+          // });
 
         } else {
           // user role = 1
