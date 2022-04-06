@@ -45,7 +45,7 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
     db.sequelize.sync();
   };
 
-  let scheduleTime = '00 30 * * * *';
+  let scheduleTime = '00 0/10 * * * *';
 
   if(process.env.NODE_ENV !== "production") scheduleTime = '0/10 * * * * *';
 

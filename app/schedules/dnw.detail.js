@@ -21,6 +21,8 @@ exports.start = async () => {
       logger.info("[schedule:dnw.detail] - EXEC CNT: " + results?.length);
       if (results) {
         
+        let execCnt = 0;
+
         let promises = results.forEach(automatic => {
           //오늘 실행 로그 조회
           db.autoDnwExecLog.findOne({
@@ -33,8 +35,8 @@ exports.start = async () => {
           .then(log => {
             
             logger.info(`[schedule:exec log] - automatic = ${automatic.id} EXIST: ${(log ? true : false)}`);
-
-            if(!log){
+            //1회 한건씩 실행하자..
+            if(!log && execCnt < 1){
               let params = { 
                 account_id: automatic.account_id, 
                 dnw_item_id: automatic.dnw_item_id, 
@@ -45,6 +47,8 @@ exports.start = async () => {
               };
 
               setDnwDetail(params, automatic.id);
+
+              execCnt++;
             }
             else{
               logger.info("[schedule:exec log] - SUCCESS: already exist");
