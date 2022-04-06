@@ -47,7 +47,7 @@ if(process.env.SCHEDULE_VAR == undefined || process.env.SCHEDULE_VAR == 0) {
 
   let scheduleTime = '00 30 * * * *';
 
-  if(process.env.NODE_ENV !== "production") scheduleTime = '30 * * * * *';
+  if(process.env.NODE_ENV !== "production") scheduleTime = '0/10 * * * * *';
 
 	// schedule your job here.
   const job = schedule.scheduleJob(scheduleTime, function(){

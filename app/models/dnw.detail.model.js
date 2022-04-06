@@ -32,5 +32,8 @@ module.exports = (sequelize, Sequelize) => {
     to_account_id : {
       type: Sequelize.INTEGER
     },
+    std_account_amount : {
+      type: Sequelize.DECIMAL(18,2),
+    },
   });
 };

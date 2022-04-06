@@ -21,7 +21,7 @@ exports.start = async () => {
       logger.info("[schedule:dnw.detail] - EXEC CNT: " + results?.length);
       if (results) {
         
-        results.forEach(automatic => {
+        let promises = results.forEach(automatic => {
           //오늘 실행 로그 조회
           db.autoDnwExecLog.findOne({
             where: {
@@ -41,7 +41,7 @@ exports.start = async () => {
                 created_user_id: automatic.created_user_id, 
                 amount: automatic.amount, 
                 standard_dt:  date.format('YYYY-MM-DD'), 
-                remark: '매월 자동 입출금' 
+                remark: '매월 자동 입출금'
               };
 
               setDnwDetail(params, automatic.id);
@@ -53,6 +53,7 @@ exports.start = async () => {
           })
           .catch(err => logger.error("[schedule:exec log] - ERROR: " + err.message));
 
+          //await Promise.all(promises);
         });
 
       }else{
@@ -70,7 +71,7 @@ exports.start = async () => {
   }
 }
 
-setDnwDetail = (params, automatic_id) => {
+const setDnwDetail = async (params, automatic_id) => {
   //return new Promise(
   db.account.findOne({
     where: {
@@ -90,11 +91,13 @@ setDnwDetail = (params, automatic_id) => {
     db.sequelize.transaction()
     .then(t => { 
 
-      logger.info(accountParams);
+      logger.info("[accountParams]", accountParams);
       
       return account.update(accountParams, { transaction: t })
         .then(result => { 
-          logger.info(params);
+          params.std_account_amount = account.amount;
+          params.latest_account_amount = accountParams.amount;
+          logger.info("[dnwParams]", params);
           return db.dnwDetail.create(params, {transaction: t}); 
         })
         .then(result => {

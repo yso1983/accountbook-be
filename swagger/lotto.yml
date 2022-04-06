@@ -1,0 +1,14 @@
+# /swagger/lotto.yml
+
+components:
+  schemas:
+    lotto:
+      properties:
+        code: 
+          type: string
+          description: 응답 고유번호
+        data:
+          type: array
+          items:
+            type: string
+            description: 번호

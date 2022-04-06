@@ -154,6 +154,30 @@ router.get('/', function(req, res, next) {
   controller.findAll(req, res);
 });
 
+  /**
+  * @swagger
+  *   /lotto/random:
+  *     get:
+  *       description: 로또 번호 조회
+  *       summary: Get lotto numbers
+  *       parameters: 
+  *        - name: cnt 
+  *          in: path 
+  *          description: 뽑을 수량을 입력하세요
+  *          required: true 
+  *          schema: 
+  *            type: string 
+  *          examples: 
+  *            Sample: 
+  *              value: 5  
+  *              summary: cnt
+  *          style: simple
+  *       produces:
+  *       - application/json
+  *       responses:
+  *         200:
+  *           description: 로또 번호 리스트
+  */
 //랜덤 추출
 router.get('/random', function(req, res, next){
   let cnt = req.query.cnt ?? 5;

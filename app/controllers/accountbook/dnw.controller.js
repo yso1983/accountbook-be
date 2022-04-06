@@ -140,6 +140,8 @@ function createOnlyDetail(params, req, res) {
       
       return account.update(accountParams, { transaction: t })
         .then(result => { 
+          params.std_account_amount = account.amount;
+          params.latest_account_amount = accountParams.amount;
           logger.info(params);
 
           return DnwDetail.create(params, {transaction: t}); 
@@ -203,6 +205,8 @@ function createDetailFromAndTo(params, to_account_id, req, res) {
         return account.update(accountParams, { transaction: t })
           .then(result => { 
             params.to_account_id = to_account_id;
+            params.std_account_amount = account.amount;
+            params.latest_account_amount = accountParams.amount;
             return DnwDetail.create(params, {transaction: t}); 
           })
           .then(result => {
@@ -214,6 +218,8 @@ function createDetailFromAndTo(params, to_account_id, req, res) {
             params.account_id = to_account_id;
             params.to_account_id = null;
             params.amount = 0 - params.amount;
+            params.std_account_amount = toAccount.amount;
+            params.latest_account_amount = toAccountParams.amount;
 
             return DnwDetail.create(params, {transaction: t}); 
           })

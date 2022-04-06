@@ -32,7 +32,7 @@ const options = {
       jwt: []
     }],
   },
-  apis: ['./app/routes/*.js', './swagger/*'],
+  apis: ['./app/routes/*.js', './routes/lotto/*.js', './swagger/*'],
 };
 
 const specs = swaggereJsdoc(options);
