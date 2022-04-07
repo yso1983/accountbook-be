@@ -35,5 +35,8 @@ module.exports = (sequelize, Sequelize) => {
     std_account_amount : {
       type: Sequelize.DECIMAL(18,2),
     },
+    latest_account_amount : {
+      type: Sequelize.DECIMAL(18,2),
+    },
   });
 };
