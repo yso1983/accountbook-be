@@ -94,7 +94,7 @@ const getRandomArray = async (cnt) =>{
 
   let rst_array = [];
 
-  let sQuery =  `select * from lotto_info WHERE 1=1 ORDER BY drwNo desc limit ` + cnt;
+  let sQuery =  `select * from lotto_info WHERE 1=1 ORDER BY drwNo desc limit ${cnt}`;
 
   let lotto =  await db.sequelize.query(sQuery, { type: QueryTypes.SELECT });
 
