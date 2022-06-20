@@ -1,0 +1,39 @@
+# /swagger/notes.yml
+
+components:
+  schemas:
+    Notes:
+      properties:
+        code: 
+          type: string
+          description: 응답 고유번호
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: 고유 번호
+              remark:
+                type: string
+                description: 메모
+              group_id:
+                type: string
+                description: 그룹 아이디
+    NoteRes:
+      properties:
+       code: 
+          type: string
+          description: 응답 고유번호
+    Note:
+      properties:
+        id:
+          type: integer
+          description: 고유 번호
+        remark:
+          type: string
+          description: 메모
+        use_yn:
+          type: string
+          description: 사용여부

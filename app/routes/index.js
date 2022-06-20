@@ -9,4 +9,5 @@ module.exports = function(app) {
   require('./dnw.routes')(app);
   require('./automatic.dnw.routes')(app);
   require('./home.routes')(app);
+  require('./note.routes')(app);
 };

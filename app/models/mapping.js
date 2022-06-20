@@ -48,4 +48,9 @@ module.exports = function(db) {
     otherKey: "userId"
   });
 
+  db.note.hasMany(db.noteHist, {foreignKey: 'note_id'});
+  db.noteHist.belongsTo(db.note, {foreignKey: 'note_id'});
+
+  db.group.hasMany(db.note, {foreignKey: 'group_id'});
+  db.note.belongsTo(db.group, {foreignKey: 'group_id'});
 };

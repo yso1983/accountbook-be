@@ -34,6 +34,8 @@ db.automaticDnw = require("@app/models/automatic.dnw.model")(sequelize, Sequeliz
 db.autoDnwExecLog = require("@app/models/automatic.dnw.history")(sequelize, Sequelize);
 db.group = require("@app/models/group.model")(sequelize, Sequelize);
 db.ssoUser = require("@app/models/sso.user.model.js")(sequelize, Sequelize);
+db.note = require("@app/models/note.model.js")(sequelize, Sequelize);
+db.noteHist = require("@app/models/note.hist.model.js")(sequelize, Sequelize);
 
 db.ROLES = ["user", "admin", "moderator"];
 
