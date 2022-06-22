@@ -15,6 +15,7 @@ function fn_findAllCondition(req){
   let year, month;
   let { dt } = req.query;
   let limit = commFunc.parseFloat(req.query.limit ?? 10);
+  let useYn = 'Y';
 
   if(dt){
     if(dt >= 6){
@@ -35,6 +36,7 @@ function fn_findAllCondition(req){
         created_dt: {
           [Op.between]: [startDt, endDt], 
         },
+        use_yn: useYn
       }, 
       limit : limit, 
       subQuery:false,
@@ -43,7 +45,8 @@ function fn_findAllCondition(req){
   }else{
     return {
       where: {
-        group_id: req.groupId
+        group_id: req.groupId,
+        use_yn: useYn
       },
       limit : limit, 
       subQuery:false,
