@@ -10,4 +10,5 @@ module.exports = function(app) {
   require('./automatic.dnw.routes')(app);
   require('./home.routes')(app);
   require('./note.routes')(app);
+  require('./mail.routes')(app);
 };

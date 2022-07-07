@@ -5,6 +5,7 @@ const dnw = require("./accountbook/dnw.controller");
 const automaticDnw = require("./accountbook/automatic.dnw.controller");
 const home = require("./accountbook/home.controller");
 const note = require("./accountbook/note.controller");
+const mail = require("./mail.controller");
 
 module.exports = {
   user,
@@ -14,4 +15,5 @@ module.exports = {
   automaticDnw,
   home,
   note,
+  mail,
 };

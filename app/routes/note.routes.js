@@ -56,6 +56,7 @@ module.exports = function(app) {
   *          $ref: '#/components/schemas/Notes'     
   */
   app.get("/api/notes", [verifyToken], controller.findAll);
+  
   app.get("/api/notes/:id/details", [verifyToken], controller.findDetail);
 
     /**

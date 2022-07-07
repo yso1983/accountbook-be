@@ -1,0 +1,15 @@
+# /swagger/mail.yml
+
+components:
+  schemas:
+    SendNoteEmail:
+      properties:
+        from: 
+          type: string
+          description: from
+        to: 
+          type: string
+          description: to
+        noteId: 
+          type: integer
+          description: 메모아이디
