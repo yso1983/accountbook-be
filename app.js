@@ -9,6 +9,7 @@ const session = require('express-session');
 const cors = require("cors");
 const schedule = require('node-schedule');
 const { swaggerUi, specs } = require('./config/swagger');
+const compression = require('compression');
 
 require('dotenv').config();
 
@@ -27,6 +28,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(compression());
 
 const db = require("./app/models");
 
